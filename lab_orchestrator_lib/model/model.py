@@ -1,0 +1,51 @@
+from typing import Union
+
+from lab_orchestrator_lib.exceptions import ValidationError
+
+
+Identifier = Union[str, int]
+
+
+class Model:
+    def __init__(self, primary_key: Identifier):
+        self.primary_key = primary_key
+
+
+class DockerImage(Model):
+    def __init__(self, primary_key: int, name: str, description: str, url: str):
+        super().__init__(primary_key)
+        if len(name) > 32:
+            raise ValidationError("name is longer than 32 characters.")
+        if len(description) > 128:
+            raise ValidationError("description is longer than 128 characters.")
+        if len(url) > 256:
+            raise ValidationError("url is longer than 256 characters.")
+        self.name: str = name
+        self.description: str = description
+        self.url: str = url
+
+
+class Lab(Model):
+    def __init__(self, primary_key: int, name: str, namespace_prefix: str, description: str, docker_image_id: int,
+                 docker_image_name: str):
+        super().__init__(primary_key)
+        if len(name) > 32:
+            raise ValidationError("name is longer than 32 characters.")
+        if len(namespace_prefix) > 32:
+            raise ValidationError("namespace_prefix is longer than 32 characters.")
+        if len(description) > 128:
+            raise ValidationError("description is longer than 128 characters.")
+        if len(docker_image_name) > 32:
+            raise ValidationError("docker_image_name is longer than 32 characters.")
+        self.name = name
+        self.namespace_prefix = namespace_prefix
+        self.description = description
+        self.docker_image_id = docker_image_id
+        self.docker_image_name = docker_image_name
+
+
+class LabInstance(Model):
+    def __init__(self, primary_key: int, lab_id: int, user_id: Union[int, str]):
+        super().__init__(primary_key)
+        self.lab_id = lab_id
+        self.user_id = user_id
