@@ -7,7 +7,7 @@ from lab_orchestrator_lib.template_engine import TemplateEngine
 CURRENT_DIR = pathlib.Path(__file__).parent.resolve()
 
 
-class MyTestCase(unittest.TestCase):
+class TemplateEngineTestCase(unittest.TestCase):
     def test_load(self):
         yaml = TemplateEngine().load("hallo:\n  - eins\n  - zwei", {})
         self.assertEqual(yaml, {"hallo": ["eins", "zwei"]})
@@ -20,7 +20,7 @@ class MyTestCase(unittest.TestCase):
         yaml_str = "hallo:\n  - eins\n  - zwei\n  - ${drei}"
         yaml = TemplateEngine().load(yaml_str, {"drei": "fünf"})
         self.assertDictEqual(yaml, {"hallo": ["eins", "zwei", "fünf"]})
-        yaml_without_var = yaml_lib.load(yaml_str)
+        yaml_without_var = yaml_lib.load(yaml_str, Loader=yaml_lib.FullLoader)
         self.assertDictEqual(yaml_without_var, {"hallo": ["eins", "zwei", "${drei}"]})
 
     def test_load_var_types(self):
