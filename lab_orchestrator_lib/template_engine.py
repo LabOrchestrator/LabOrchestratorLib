@@ -1,13 +1,17 @@
 import re
-from typing import Any, Dict, Union, TextIO
+from typing import Any, Dict, Union, TextIO, Hashable
 
-import yaml as yaml_lib
+import yaml as yaml_library
 
 
 _path_matcher = re.compile(r'\$\{([^}^{]+)\}')
 
+DataType = Dict[str, Any]
+YamlStrType = Union[str, TextIO]
+YamlType = Union[Dict[Hashable, Any], list, None]
 
-def _path_constructor_factory(data: Dict[str, Any], strict: bool):
+
+def _path_constructor_factory(data: DataType, strict: bool):
     """Constructor factory for yaml.
 
     A factory that creates a constructor method, that replaces yaml-variables with the values in the data dictionary.
@@ -34,10 +38,10 @@ def _path_constructor_factory(data: Dict[str, Any], strict: bool):
     return path_constructor
 
 
-class _VariableLoader(yaml_lib.FullLoader):
+class _VariableLoader(yaml_library.FullLoader):
     """Loader that is used for replacing yaml-variables."""
-    yaml_constructors = yaml_lib.FullLoader.yaml_constructors.copy()
-    yaml_implicit_resolvers = yaml_lib.FullLoader.yaml_implicit_resolvers.copy()
+    yaml_constructors = yaml_library.FullLoader.yaml_constructors.copy()
+    yaml_implicit_resolvers = yaml_library.FullLoader.yaml_implicit_resolvers.copy()
 
 
 class TemplateEngine:
@@ -46,7 +50,10 @@ class TemplateEngine:
     Used to replace yaml-variables.
     """
 
-    def load(self, yaml_str: Union[str, TextIO], data: Dict[str, Any], strict: bool = False):
+    def __init__(self, yaml_lib=yaml_library):
+        self.yaml_lib = yaml_lib
+
+    def load(self, yaml_str: YamlStrType, data: DataType, strict: bool = False) -> YamlType:
         """Parses a yaml string to a python object and replaces yaml-variables.
 
         :param yaml_str: The yaml string that should be parsed.
@@ -57,10 +64,10 @@ class TemplateEngine:
         """
         _VariableLoader.add_implicit_resolver('!path', _path_matcher, None)
         _VariableLoader.add_constructor('!path', _path_constructor_factory(data, strict))
-        p = yaml_lib.load(yaml_str, Loader=_VariableLoader)
+        p = self.yaml_lib.load(yaml_str, Loader=_VariableLoader)
         return p
 
-    def load_file(self, filename: str, data: Dict[str, Any], strict: bool = False):
+    def load_file(self, filename: str, data: DataType, strict: bool = False) -> YamlType:
         """Reads a file and parses the content as yaml to a python object and replaces yaml-variables.
 
         :param filename: The file that contains the yaml.
@@ -72,11 +79,11 @@ class TemplateEngine:
         with open(filename) as cont:
             return self.load(cont, data, strict)
 
-    def dump(self, yaml) -> str:
+    def dump(self, yaml: Union[YamlType, Any]) -> str:
         """Converts a yaml object back to a string."""
-        return yaml_lib.dump(yaml, Dumper=yaml_lib.Dumper, allow_unicode=True)
+        return self.yaml_lib.dump(yaml, Dumper=self.yaml_lib.Dumper, allow_unicode=True)
 
-    def replace_file(self, filename: str, data: Dict[str, Any], strict: bool=False) -> str:
+    def replace_file(self, filename: str, data: DataType, strict: bool = False) -> str:
         """Reads a file and replaces the variables.
 
         :param filename: The file that contains the yaml.
@@ -88,7 +95,7 @@ class TemplateEngine:
         yaml = self.load_file(filename, data, strict)
         return self.dump(yaml)
 
-    def replace(self, yaml_str: str, data: Dict[str, Any]) -> str:
+    def replace(self, yaml_str: YamlStrType, data: DataType) -> str:
         """Replaces the variables in the yaml string.
 
         :param yaml_str: The yaml string that should be replaced.
