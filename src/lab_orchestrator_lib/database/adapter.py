@@ -1,28 +1,72 @@
-class Adapter:
-    @classmethod
-    def create(cls, **kwargs):
+from typing import List
+
+from lab_orchestrator_lib.model.model import DockerImage, Lab, LabInstance
+
+
+class DockerImageAdapter:
+    def create(self, obj: DockerImage) -> DockerImage:
         raise NotImplementedError()
 
-    @classmethod
-    def get_all(cls):
+    def get_all(self) -> List[DockerImage]:
         raise NotImplementedError()
 
-    @classmethod
-    def get(cls, identifier):
+    def get(self, identifier) -> DockerImage:
         raise NotImplementedError()
 
-    @classmethod
-    def get_by_attr(cls, attr, value):
+    def get_by_attr(self, attr, value) -> DockerImage:
         raise NotImplementedError()
 
-    @classmethod
-    def delete(cls, identifier):
+    def delete(self, identifier) -> None:
         raise NotImplementedError()
 
-    @classmethod
-    def save(cls, obj):
+    def save(self, obj: DockerImage) -> DockerImage:
         raise NotImplementedError()
 
-    @classmethod
-    def filter(cls, **kwargs):
+    def filter(self, **kwargs) -> DockerImage:
+        raise NotImplementedError()
+
+
+class LabAdapter:
+    def create(self, obj: Lab) -> Lab:
+        raise NotImplementedError()
+
+    def get_all(self) -> List[Lab]:
+        raise NotImplementedError()
+
+    def get(self, identifier) -> Lab:
+        raise NotImplementedError()
+
+    def get_by_attr(self, attr, value) -> Lab:
+        raise NotImplementedError()
+
+    def delete(self, identifier) -> None:
+        raise NotImplementedError()
+
+    def save(self, obj: Lab) -> Lab:
+        raise NotImplementedError()
+
+    def filter(self, **kwargs) -> Lab:
+        raise NotImplementedError()
+
+
+class LabInstanceAdapter:
+    def create(self, obj: LabInstance) -> LabInstance:
+        raise NotImplementedError()
+
+    def get_all(self) -> List[LabInstance]:
+        raise NotImplementedError()
+
+    def get(self, identifier) -> LabInstance:
+        raise NotImplementedError()
+
+    def get_by_attr(self, attr, value) -> LabInstance:
+        raise NotImplementedError()
+
+    def delete(self, identifier) -> None:
+        raise NotImplementedError()
+
+    def save(self, obj: LabInstance) -> LabInstance:
+        raise NotImplementedError()
+
+    def filter(self, **kwargs) -> LabInstance:
         raise NotImplementedError()
