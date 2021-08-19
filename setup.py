@@ -24,5 +24,5 @@ setup(
     package_dir={"": "src"},
     packages=find_packages(where="src"),
     python_requires=">=3.8",
-    install_requires=['']
+    install_requires=['PyYAML~=5.4.1', 'requests~=2.26.0']
 )
