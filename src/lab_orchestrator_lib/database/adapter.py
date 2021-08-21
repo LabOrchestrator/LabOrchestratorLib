@@ -1,6 +1,18 @@
 from typing import List, Any, Dict
 
-from lab_orchestrator_lib.model.model import DockerImage, Lab, LabInstance, Identifier
+from lab_orchestrator_lib.model.model import DockerImage, Lab, LabInstance, Identifier, User
+
+
+class UserAdapterInterface:
+    """
+
+    Contains only get methods, because the lab_controller_lib won't create or delete users.
+    """
+    def get_all(self) -> List[User]:
+        raise NotImplementedError()
+
+    def get(self, identifier: Identifier) -> User:
+        raise NotImplementedError()
 
 
 class DockerImageAdapterInterface:
