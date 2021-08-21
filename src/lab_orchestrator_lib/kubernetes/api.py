@@ -49,7 +49,7 @@ class Proxy:
                                      headers=headers, verify=self.verify)
         return response.text
 
-    def post(self, address: str, data: Dict[str, Any]) -> str:
+    def post(self, address: str, data: str) -> str:
         headers = {"Authorization": f"Bearer {self.service_account_token}",
                    "Content-Type": "application/yaml"}
         response = self.requests.post(self.base_uri + address,
@@ -110,7 +110,7 @@ class NamespacedApi(ApiExtension):
     def get_list(self, namespace: str) -> str:
         return self.proxy.get(self.list_url.format(namespace=namespace))
 
-    def create(self, namespace: str, data: Dict[str, Any]) -> str:
+    def create(self, namespace: str, data: str) -> str:
         return self.proxy.post(self.list_url.format(namespace=namespace), data)
 
     def get(self, namespace: str, identifier: str) -> str:
@@ -130,7 +130,7 @@ class NotNamespacedApi(ApiExtension):
     def get_list(self) -> str:
         return self.proxy.get(self.list_url)
 
-    def create(self, data: Dict[str, Any]) -> str:
+    def create(self, data: str) -> str:
         return self.proxy.post(self.list_url, data)
 
     def get(self, identifier: str) -> str:
