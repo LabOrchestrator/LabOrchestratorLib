@@ -1,6 +1,9 @@
-from typing import Generic, List
+from typing import Generic, List, TypeVar, Any
 
-from lab_orchestrator_lib.controller.controller import Adapter, LibModelType
+from lab_orchestrator_lib.model.model import DockerImage, Lab, LabInstance
+
+Adapter = Any
+LibModelType = TypeVar('LibModelType', DockerImage, Lab, LabInstance)  # subclasses of Model
 
 
 class AdapterController(Generic[Adapter, LibModelType]):

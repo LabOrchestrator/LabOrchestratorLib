@@ -1,4 +1,4 @@
-from typing import TypeVar, Any, List
+from typing import List
 
 from lab_orchestrator_lib_auth.auth import generate_auth_token, LabInstanceTokenParams
 from lab_orchestrator_lib.controller.adapter_controller import AdapterController
@@ -7,9 +7,6 @@ from lab_orchestrator_lib.database.adapter import DockerImageAdapterInterface, L
     LabInstanceAdapterInterface, UserAdapterInterface
 from lab_orchestrator_lib.kubernetes.api import NotNamespacedApi, NamespacedApi, APIRegistry
 from lab_orchestrator_lib.model.model import DockerImage, Lab, LabInstance, Identifier, User, LabInstanceKubernetes
-
-Adapter = Any
-LibModelType = TypeVar('LibModelType', DockerImage, Lab, LabInstance)  # subclasses of Model
 
 
 class UserController:
@@ -175,5 +172,5 @@ class LabInstanceController(AdapterController):
         lab_instances = self.adapter.filter_by(user_id=user.primary_key)
         return lab_instances
 
-    def save(self, obj: LibModelType) -> LibModelType:
+    def save(self, obj: LabInstance) -> LabInstance:
         raise Exception("LabInstances can't be mutated.")
