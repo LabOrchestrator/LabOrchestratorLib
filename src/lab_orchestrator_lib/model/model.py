@@ -11,6 +11,11 @@ class Model:
         self.primary_key = primary_key
 
 
+class User(Model):
+    def __init__(self, primary_key: Identifier):
+        super().__init__(primary_key)
+
+
 class DockerImage(Model):
     def __init__(self, primary_key: Identifier, name: str, description: str, url: str):
         super().__init__(primary_key)
