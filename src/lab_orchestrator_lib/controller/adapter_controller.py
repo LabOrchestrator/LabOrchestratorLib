@@ -2,7 +2,7 @@ from typing import Generic, List, TypeVar, Any
 
 from lab_orchestrator_lib.model.model import DockerImage, Lab, LabInstance
 
-Adapter = Any
+Adapter = TypeVar('Adapter')
 LibModelType = TypeVar('LibModelType', DockerImage, Lab, LabInstance)  # subclasses of Model
 
 
