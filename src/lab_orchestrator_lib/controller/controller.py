@@ -1,11 +1,12 @@
 from typing import TypeVar, Any, List
 
+from lab_orchestrator_lib_auth.auth import generate_auth_token, LabInstanceTokenParams
 from lab_orchestrator_lib.controller.adapter_controller import AdapterController
 from lab_orchestrator_lib.controller.kubernetes_controller import NamespacedController, NotNamespacedController
 from lab_orchestrator_lib.database.adapter import DockerImageAdapterInterface, LabAdapterInterface, \
     LabInstanceAdapterInterface, UserAdapterInterface
 from lab_orchestrator_lib.kubernetes.api import NotNamespacedApi, NamespacedApi, APIRegistry
-from lab_orchestrator_lib.model.model import DockerImage, Lab, LabInstance, Identifier, User
+from lab_orchestrator_lib.model.model import DockerImage, Lab, LabInstance, Identifier, User, LabInstanceKubernetes
 
 Adapter = Any
 LibModelType = TypeVar('LibModelType', DockerImage, Lab, LabInstance)  # subclasses of Model
@@ -107,13 +108,15 @@ class LabInstanceController(AdapterController):
                  namespace_ctrl: NamespaceController,
                  lab_ctrl: LabController,
                  network_policy_ctrl: NetworkPolicyController,
-                 user_ctrl: UserController):
+                 user_ctrl: UserController,
+                 secret_key: str):
         super().__init__(adapter)
         self.virtual_machine_instance_ctrl = virtual_machine_instance_ctrl
         self.namespace_ctrl = namespace_ctrl
         self.lab_ctrl = lab_ctrl
         self.network_policy_ctrl = network_policy_ctrl
         self.user_ctrl = user_ctrl
+        self.secret_key = secret_key
 
     @staticmethod
     def get_namespace_name(lab_instance: LabInstance, lab_instance_ctrl):
@@ -124,7 +127,7 @@ class LabInstanceController(AdapterController):
     def gen_namespace_name(lab: Lab, user_id, lab_instance_id):
         return f"{lab.namespace_prefix}-{user_id}-{lab_instance_id}"
 
-    def create(self, lab_id: Identifier, user_id: Identifier):
+    def create(self, lab_id: Identifier, user_id: Identifier) -> LabInstanceKubernetes:
         lab = self.lab_ctrl.get(lab_id)
         if lab is None:
             # TODO sinnvolle exception werfen
@@ -154,6 +157,10 @@ class LabInstanceController(AdapterController):
         #    self.adapter.delete(lab_instance.primary_key)
         #    self.namespace_ctrl.delete(namespace_name)
         #    raise Exception
+        lab_instance_token_params = LabInstanceTokenParams(lab_id, namespace_name, lab.docker_image_name)
+        token = generate_auth_token(user_id=user_id, lab_instance_token_params=lab_instance_token_params,
+                                    secret_key=self.secret_key)
+        LabInstanceKubernetes(primary_key=lab_instance.primary_key, lab_id=lab_id, user_id=user_id, jwt_token=token)
         return lab_instance
 
     def delete(self, lab_instance: LabInstance):

@@ -1,3 +1,3 @@
 PyYAML==5.4.1
 requests==2.26.0
-PyJWT==2.1.0
+lab-orchestrator-lib-auth==0.0.0
