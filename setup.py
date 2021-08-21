@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setup(
     name="lab-orchestrator-lib",
-    version="0.0.0",
+    version="0.0.2",
     author="Marco Schlicht",
     author_email="git@privacymail.dev",
     description="Manages Labs in your Kubernetes Cluster",
