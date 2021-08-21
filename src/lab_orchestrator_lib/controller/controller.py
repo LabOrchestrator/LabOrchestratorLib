@@ -1,16 +1,25 @@
-from typing import TypeVar, Any
+from typing import TypeVar, Any, List
 
 from lab_orchestrator_lib.controller.adapter_controller import AdapterController
 from lab_orchestrator_lib.controller.kubernetes_controller import NamespacedController, NotNamespacedController
 from lab_orchestrator_lib.database.adapter import DockerImageAdapterInterface, LabAdapterInterface, \
-    LabInstanceAdapterInterface
+    LabInstanceAdapterInterface, UserAdapterInterface
 from lab_orchestrator_lib.kubernetes.api import NotNamespacedApi, NamespacedApi, APIRegistry
-from lab_orchestrator_lib.model.model import DockerImage, Lab, LabInstance, Identifier
+from lab_orchestrator_lib.model.model import DockerImage, Lab, LabInstance, Identifier, User
 
 Adapter = Any
 LibModelType = TypeVar('LibModelType', DockerImage, Lab, LabInstance)  # subclasses of Model
 
-User = Any
+
+class UserController:
+    def __init__(self, adapter: UserAdapterInterface):
+        self.adapter = adapter
+
+    def get_all(self) -> List[User]:
+        return self.adapter.get_all()
+
+    def get(self, identifier) -> User:
+        return self.adapter.get(identifier)
 
 
 class NamespaceController(NotNamespacedController):
@@ -92,15 +101,19 @@ class LabController(AdapterController):
 
 
 class LabInstanceController(AdapterController):
-    def __init__(self, adapter: LabInstanceAdapterInterface,
+    def __init__(self,
+                 adapter: LabInstanceAdapterInterface,
                  virtual_machine_instance_ctrl: VirtualMachineInstanceController,
-                 namespace_ctrl: NamespaceController, lab_ctrl: LabController,
-                 network_policy_ctrl: NetworkPolicyController, user_ctrl: UserController):
+                 namespace_ctrl: NamespaceController,
+                 lab_ctrl: LabController,
+                 network_policy_ctrl: NetworkPolicyController,
+                 user_ctrl: UserController):
         super().__init__(adapter)
         self.virtual_machine_instance_ctrl = virtual_machine_instance_ctrl
         self.namespace_ctrl = namespace_ctrl
         self.lab_ctrl = lab_ctrl
         self.network_policy_ctrl = network_policy_ctrl
+        self.user_ctrl = user_ctrl
 
     @staticmethod
     def get_namespace_name(lab_instance: LabInstance, lab_instance_ctrl):
@@ -126,21 +139,21 @@ class LabInstanceController(AdapterController):
         namespace = self.namespace_ctrl.create(namespace_name)
         # TODO fix response code
         # TODO log if deletion doesn't work
-        if namespace.response_code != 0:
-            self.adapter.delete(lab_instance.primary_key)
-            raise Exception
+        #if namespace.response_code != 0:
+        #    self.adapter.delete(lab_instance.primary_key)
+        #    raise Exception
         # create network policy
         network_policy = self.network_policy_ctrl.create(namespace_name)
-        if network_policy.response_code != 0:
-            self.adapter.delete(lab_instance.primary_key)
-            self.namespace_ctrl.delete(namespace_name)
-            raise Exception
+        #if network_policy.response_code != 0:
+        #    self.adapter.delete(lab_instance.primary_key)
+        #    self.namespace_ctrl.delete(namespace_name)
+        #    raise Exception
         # create vmi
         vmi = self.virtual_machine_instance_ctrl.create(namespace_name, lab)
-        if vmi.response_code != 0:
-            self.adapter.delete(lab_instance.primary_key)
-            self.namespace_ctrl.delete(namespace_name)
-            raise Exception
+        #if vmi.response_code != 0:
+        #    self.adapter.delete(lab_instance.primary_key)
+        #    self.namespace_ctrl.delete(namespace_name)
+        #    raise Exception
         return lab_instance
 
     def delete(self, lab_instance: LabInstance):
