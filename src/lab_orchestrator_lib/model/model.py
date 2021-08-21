@@ -54,3 +54,15 @@ class LabInstance(Model):
         super().__init__(primary_key)
         self.lab_id = lab_id
         self.user_id = user_id
+
+
+class LabInstanceKubernetes(Model):
+    """Doesn't need any adapter and should not be saved in the database. This is used to return information about a
+    lab instance including information from kubernetes and the jwt token."""
+    def __init__(self, primary_key: Identifier, lab_id: Identifier, user_id: Identifier, jwt_token: str):
+        super().__init__(primary_key)
+        self.lab_id = lab_id
+        self.user_id = user_id
+        self.jwt_token = jwt_token
+
+
