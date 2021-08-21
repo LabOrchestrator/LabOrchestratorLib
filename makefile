@@ -1,4 +1,5 @@
 build:
+	rm -Rf dist/*
 	python3 -m build
 
 push:
