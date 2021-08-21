@@ -1,18 +1,26 @@
+import re
 from setuptools import setup, find_packages
+from os.path import abspath, dirname, join
 
-with open("README.md", "r", encoding="utf-8") as fh:
-    long_description = fh.read()
+CURDIR = dirname(abspath(__file__))
+
+with open(join(CURDIR, 'src', 'lab_orchestrator_lib', '__init__.py'), "r", encoding="utf-8") as f:
+    VERSION = re.search('\n__version__ = "(.*)"', f.read()).group(1)
+with open(join(CURDIR, 'README.md'), "r", encoding="utf-8") as f:
+    LONG_DESCRIPTION = f.read()
+with open(join(CURDIR, 'requirements.txt'), "r", encoding="utf-8") as f:
+    REQUIREMENTS = f.read().splitlines()
 
 setup(
     name="lab-orchestrator-lib",
-    version="0.0.2",
+    version=VERSION,
     author="Marco Schlicht",
     author_email="git@privacymail.dev",
     description="Manages Labs in your Kubernetes Cluster",
-    long_description=long_description,
+    long_description=LONG_DESCRIPTION,
     long_description_content_type="text/markdown",
     url="https://github.com/LabOrchestrator/LabOrchestratorLib",
-    license="MPL",
+    license="Mozilla Public License 2.0 (MPL 2.0)",
     project_urls={
         "Bug Tracker": "https://github.com/LabOrchestrator/LabOrchestratorLib/issues",
     },
@@ -24,5 +32,5 @@ setup(
     package_dir={"": "src"},
     packages=find_packages(where="src"),
     python_requires=">=3.8",
-    install_requires=['PyYAML~=5.4.1', 'requests~=2.26.0']
+    install_requires=REQUIREMENTS,
 )
