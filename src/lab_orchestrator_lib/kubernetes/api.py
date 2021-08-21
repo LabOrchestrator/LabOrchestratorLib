@@ -1,6 +1,6 @@
 import logging
 from abc import ABC
-from typing import Dict, Type, Callable, Union, Optional
+from typing import Dict, Type, Callable, Union, Optional, Any
 
 import requests
 
@@ -27,8 +27,8 @@ def add_api_not_namespaced(name: str) -> NotNamespacedApiDecorator:
 
 
 class Proxy:
-    def __init__(self, base_uri, service_account_token=None,
-                 cacert=None, insecure_ssl=False, requests_lib=requests):
+    def __init__(self, base_uri: str, service_account_token: str = None,
+                 cacert: str = None, insecure_ssl: str = False, requests_lib=requests):
         self.requests = requests_lib
         if service_account_token is None:
             logging.warning("No service account token.")
@@ -43,20 +43,20 @@ class Proxy:
         else:
             self.verify = cacert
 
-    def get(self, address):
+    def get(self, address: str) -> str:
         headers = {"Authorization": f"Bearer {self.service_account_token}"}
         response = self.requests.get(self.base_uri + address,
                                      headers=headers, verify=self.verify)
         return response.text
 
-    def post(self, address, data):
+    def post(self, address: str, data: Dict[str, Any]) -> str:
         headers = {"Authorization": f"Bearer {self.service_account_token}",
                    "Content-Type": "application/yaml"}
         response = self.requests.post(self.base_uri + address,
                                       data=data, headers=headers, verify=self.verify)
         return response.text
 
-    def delete(self, address):
+    def delete(self, address) -> str:
         headers = {"Authorization": f"Bearer {self.service_account_token}"}
         response = self.requests.delete(self.base_uri + address,
                                         headers=headers, verify=self.verify)
@@ -107,16 +107,16 @@ class NamespacedApi(ApiExtension):
     :list_url: Will be formated with the variable "namespace".
     :detail_url: Will be formated with the variable "namespace" and "identifier".
     """
-    def get_list(self, namespace):
+    def get_list(self, namespace: str) -> str:
         return self.proxy.get(self.list_url.format(namespace=namespace))
 
-    def create(self, namespace, data):
+    def create(self, namespace: str, data: Dict[str, Any]) -> str:
         return self.proxy.post(self.list_url.format(namespace=namespace), data)
 
-    def get(self, namespace, identifier):
+    def get(self, namespace: str, identifier: str) -> str:
         return self.proxy.get(self.detail_url.format(namespace=namespace, identifier=identifier))
 
-    def delete(self, namespace, identifier):
+    def delete(self, namespace: str, identifier: str) -> str:
         return self.proxy.delete(self.detail_url.format(namespace=namespace, identifier=identifier))
 
 
@@ -127,16 +127,16 @@ class NotNamespacedApi(ApiExtension):
     :detail_url: Will be formated with the variable "identifier".
     """
 
-    def get_list(self):
+    def get_list(self) -> str:
         return self.proxy.get(self.list_url)
 
-    def create(self, data):
+    def create(self, data: Dict[str, Any]) -> str:
         return self.proxy.post(self.list_url, data)
 
-    def get(self, identifier):
+    def get(self, identifier: str) -> str:
         return self.proxy.get(self.detail_url.format(identifier=identifier))
 
-    def delete(self, identifier):
+    def delete(self, identifier: str) -> str:
         return self.proxy.delete(self.detail_url.format(identifier=identifier))
 
 
