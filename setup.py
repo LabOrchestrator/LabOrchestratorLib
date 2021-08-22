@@ -4,7 +4,7 @@ from os.path import abspath, dirname, join
 
 CURDIR = dirname(abspath(__file__))
 
-with open(join(CURDIR, 'src', 'lab_orchestrator_lib', '__init__.py'), "r", encoding="utf-8") as f:
+with open(join(CURDIR, 'src', 'lab_orchestrator_lib_django_adapter', '__init__.py'), "r", encoding="utf-8") as f:
     VERSION = re.search('^__version__ = "(.*)"', f.read()).group(1)
 with open(join(CURDIR, 'README.md'), "r", encoding="utf-8") as f:
     LONG_DESCRIPTION = f.read()

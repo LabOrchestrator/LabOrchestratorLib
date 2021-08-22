@@ -23,7 +23,8 @@ def create_controller_collection(
         user_adapter: UserAdapterInterface,
         docker_image_adapter: DockerImageAdapterInterface,
         lab_adapter: LabAdapterInterface,
-        lab_instance_adapter: LabInstanceAdapterInterface):
+        lab_instance_adapter: LabInstanceAdapterInterface,
+        secret_key: str):
     user_ctrl = UserController(user_adapter)
     namespace_ctrl = NamespaceController(registry)
     network_policy_ctrl = NetworkPolicyController(registry)
@@ -37,6 +38,7 @@ def create_controller_collection(
         lab_ctrl=lab_ctrl,
         network_policy_ctrl=network_policy_ctrl,
         user_ctrl=user_ctrl,
+        secret_key=secret_key,
     )
     return ControllerCollection(
         user_ctrl=user_ctrl,
