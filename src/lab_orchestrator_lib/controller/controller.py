@@ -157,8 +157,7 @@ class LabInstanceController(AdapterController):
         lab_instance_token_params = LabInstanceTokenParams(lab_id, namespace_name, lab.docker_image_name)
         token = generate_auth_token(user_id=user_id, lab_instance_token_params=lab_instance_token_params,
                                     secret_key=self.secret_key)
-        LabInstanceKubernetes(primary_key=lab_instance.primary_key, lab_id=lab_id, user_id=user_id, jwt_token=token)
-        return lab_instance
+        return LabInstanceKubernetes(primary_key=lab_instance.primary_key, lab_id=lab_id, user_id=user_id, jwt_token=token)
 
     def delete(self, lab_instance: LabInstance):
         lab = self.lab_ctrl.get(lab_instance.lab_id)
