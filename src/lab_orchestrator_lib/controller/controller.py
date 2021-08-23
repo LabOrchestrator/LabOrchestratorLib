@@ -161,7 +161,7 @@ class LabInstanceController(AdapterController):
         return lab_instance
 
     def delete(self, lab_instance: LabInstance):
-        super().delete(lab_instance)
+        super().delete(lab_instance.primary_key)
         lab = self.lab_ctrl.get(lab_instance.lab_id)
         namespace_name = LabInstanceController.gen_namespace_name(lab, lab_instance.user_id, lab_instance.primary_key)
         self.namespace_ctrl.delete(namespace_name)
