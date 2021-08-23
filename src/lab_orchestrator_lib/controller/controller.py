@@ -21,7 +21,7 @@ class UserController:
 
 
 class NamespaceController(NotNamespacedController):
-    template_file = 'templates/namespace_template.yaml'
+    template_file = "namespace_template.yaml"
 
     def _api(self) -> NotNamespacedApi:
         return self.registry.namespace
@@ -33,7 +33,7 @@ class NamespaceController(NotNamespacedController):
 
 
 class NetworkPolicyController(NamespacedController):
-    template_file = 'templates/network_policy_template.yaml'
+    template_file = 'network_policy_template.yaml'
 
     def _api(self) -> NamespacedApi:
         return self.registry.network_policy
@@ -57,7 +57,7 @@ class DockerImageController(AdapterController):
 
 
 class VirtualMachineInstanceController(NamespacedController):
-    template_file = 'templates/vmi_template.yaml'
+    template_file = 'vmi_template.yaml'
 
     def __init__(self, registry: APIRegistry, namespace_ctrl: NamespaceController,
                  docker_image_ctrl: DockerImageController):

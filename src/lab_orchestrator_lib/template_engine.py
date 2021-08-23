@@ -2,6 +2,8 @@ import re
 from typing import Any, Dict, Union, TextIO, Hashable
 
 import yaml as yaml_library
+import importlib.resources as pkg_resources
+from . import templates
 
 
 _path_matcher = re.compile(r'\$\{([^}^{]+)\}')
@@ -67,6 +69,19 @@ class TemplateEngine:
         p = self.yaml_lib.load(yaml_str, Loader=_VariableLoader)
         return p
 
+    def load_template(self, template: str, data: DataType, strict: bool = False) -> YamlType:
+        """Reads a template from the template module and parses the content as yaml to a python object and replaces
+        yaml-variables.
+
+        :param template: The template that contains the yaml.
+        :param data: The data that should be inserted into the yaml-variables.
+        :param strict: If True, an error will be thrown when variables have no value in the data dictionary. If false
+        the default value None will be used.
+        :return: yaml object.
+        """
+        cont = pkg_resources.read_text(templates, template)
+        return self.load(cont, data, strict)
+
     def load_file(self, filename: str, data: DataType, strict: bool = False) -> YamlType:
         """Reads a file and parses the content as yaml to a python object and replaces yaml-variables.
 
@@ -82,6 +97,18 @@ class TemplateEngine:
     def dump(self, yaml: Union[YamlType, Any]) -> str:
         """Converts a yaml object back to a string."""
         return self.yaml_lib.dump(yaml, Dumper=self.yaml_lib.Dumper, allow_unicode=True)
+
+    def replace_template(self, template: str, data: DataType, strict: bool = False) -> str:
+        """Reads a template and replaces the variables.
+
+        :param template: The template that contains the yaml.
+        :param data: The data that should be inserted into the yaml-variables.
+        :param strict: If True, an error will be thrown when variables have no value in the data dictionary. If false
+        the default value None will be used.
+        :return: The file content as string with replaced variables.
+        """
+        yaml = self.load_template(template, data, strict)
+        return self.dump(yaml)
 
     def replace_file(self, filename: str, data: DataType, strict: bool = False) -> str:
         """Reads a file and replaces the variables.
