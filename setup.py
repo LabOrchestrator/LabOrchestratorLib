@@ -31,6 +31,7 @@ setup(
     ],
     package_dir={"": "src"},
     packages=find_packages(where="src"),
+    include_package_data = True,  # MANIFEST.in
     python_requires=">=3.8",
     install_requires=REQUIREMENTS,
     zip_safe=True,

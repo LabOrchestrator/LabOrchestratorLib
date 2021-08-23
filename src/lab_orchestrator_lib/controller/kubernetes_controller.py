@@ -9,7 +9,7 @@ class KubernetesController:
         self.registry = registry
 
     def _get_template(self, template_data) -> str:
-        return TemplateEngine().replace_file(filename=self.template_file, data=template_data)
+        return TemplateEngine().replace_template(template=self.template_file, data=template_data)
 
 
 class NamespacedController(KubernetesController):
