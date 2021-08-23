@@ -1,0 +1,22 @@
+metadata:
+  namespace: ${namespace}
+  name: ${vmi_name}
+  labels:
+    special: key
+apiVersion: kubevirt.io/v1alpha3
+kind: VirtualMachineInstance
+spec:
+  domain:
+    cpu:
+      cores: ${cores} #3
+    resources:
+      requests:
+        memory: ${memory} #3G
+    devices:
+      disks:
+      - name: containerdisk
+        disk: {}
+  volumes:
+    - name: containerdisk
+      containerDisk:
+        image: ${vm_image}
