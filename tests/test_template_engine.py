@@ -41,12 +41,31 @@ class TemplateEngineTestCase(unittest.TestCase):
         with self.assertRaises(KeyError):
             TemplateEngine().load_file(f"{CURRENT_DIR}/resources/namespace_template.yaml", {}, True)
 
+    def test_load_template(self):
+        yaml = TemplateEngine().load_template("namespace_template.yaml", {"namespace": "lab-1"})
+        expected = {"kind": "Namespace", "apiVersion": "v1", "metadata": {"name": "lab-1"}}
+        self.assertDictEqual(yaml, expected)
+
+    def test_load_template_defaults(self):
+        yaml = TemplateEngine().load_template("namespace_template.yaml", {})
+        expected = {"kind": "Namespace", "apiVersion": "v1", "metadata": {"name": None}}
+        self.assertDictEqual(yaml, expected)
+
+    def test_load_template_strict(self):
+        with self.assertRaises(KeyError):
+            TemplateEngine().load_template("namespace_template.yaml", {}, True)
+
     def test_replace(self):
         yaml = TemplateEngine().replace("hallo:\n  - eins\n  - zwei\n  - ${drei}", {"drei": "fünf"})
         self.assertEqual(yaml, "hallo:\n- eins\n- zwei\n- fünf\n")
 
     def test_replace_file(self):
         yaml = TemplateEngine().replace_file(f"{CURRENT_DIR}/resources/namespace_template.yaml", {"namespace": "lab-1"})
+        expected = "apiVersion: v1\nkind: Namespace\nmetadata:\n  name: lab-1\n"
+        self.assertEqual(yaml, expected)
+
+    def test_replace_template(self):
+        yaml = TemplateEngine().replace_template("namespace_template.yaml", {"namespace": "lab-1"})
         expected = "apiVersion: v1\nkind: Namespace\nmetadata:\n  name: lab-1\n"
         self.assertEqual(yaml, expected)
 
