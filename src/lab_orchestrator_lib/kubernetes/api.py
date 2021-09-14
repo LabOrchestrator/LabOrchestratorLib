@@ -27,8 +27,8 @@ def add_api_not_namespaced(name: str) -> NotNamespacedApiDecorator:
 
 
 class Proxy:
-    def __init__(self, base_uri: str, service_account_token: str = None,
-                 cacert: str = None, insecure_ssl: str = False, requests_lib=requests):
+    def __init__(self, base_uri: str, service_account_token: Optional[str] = None,
+                 cacert: Optional[str] = None, insecure_ssl: bool = False, requests_lib=requests):
         self.requests = requests_lib
         if service_account_token is None:
             logging.warning("No service account token.")
