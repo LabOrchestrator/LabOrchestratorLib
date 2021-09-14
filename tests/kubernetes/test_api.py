@@ -3,6 +3,7 @@ import unittest
 from lab_orchestrator_lib.kubernetes.api import add_api_namespaced, NamespacedApi, _API_EXTENSIONS_NAMESPACED, \
     _API_EXTENSIONS_NOT_NAMESPACED, add_api_not_namespaced, NotNamespacedApi, Proxy, APIRegistry, Namespace, \
     VirtualMachineInstance, NetworkPolicy
+from tests.kubernetes.mockups import ProxyMock, RequestsMock, RequestsResponseMock
 
 
 class ExampleNamespacedApi(NamespacedApi):
@@ -23,15 +24,6 @@ class AddApiDecoratorTestCase(unittest.TestCase):
         new_cls = add_api_not_namespaced("example_not_namespaced_api")(ExampleNotNamespacedApi)
         self.assertEqual(new_cls, ExampleNotNamespacedApi)
         self.assertEqual(_API_EXTENSIONS_NOT_NAMESPACED.get("example_not_namespaced_api"), ExampleNotNamespacedApi)
-
-
-class RequestsMock:
-    pass
-
-
-class RequestsResponseMock:
-    def __init__(self, text):
-        self.text = text
 
 
 class ProxyTestCase(unittest.TestCase):
@@ -140,3 +132,176 @@ class APIRegistryTestCase(unittest.TestCase):
         self.assertIsInstance(registry.namespace, Namespace)
         self.assertIsInstance(registry.virtual_machine_instance, VirtualMachineInstance)
         self.assertIsInstance(registry.network_policy, NetworkPolicy)
+
+
+class ExampleNamespacedApi2(NamespacedApi):
+    list_url = "example/{namespace}"
+    detail_url = "example/{namespace}/{identifier}"
+
+
+class NamespacedApiTestCase(unittest.TestCase):
+    def setUp(self) -> None:
+        self.proxy = ProxyMock("/api")
+        self.proxy.test = self
+        self.api = ExampleNamespacedApi2(self.proxy)
+
+    def test_get_list(self):
+        self.proxy.get_ret = "hallo"
+        namespace = "ns1"
+        self.proxy.asserted_get_address = f"example/{namespace}"
+        ret = self.api.get_list(namespace)
+        self.assertEqual(ret, self.proxy.get_ret)
+
+    def test_get(self):
+        self.proxy.get_ret = "hallo"
+        namespace = "ns1"
+        identifier = "8"
+        self.proxy.asserted_get_address = f"example/{namespace}/{identifier}"
+        ret = self.api.get(namespace, identifier)
+        self.assertEqual(ret, self.proxy.get_ret)
+
+    def test_create(self):
+        self.proxy.post_ret = "hallo"
+        namespace = "ns1"
+        data = "data"
+        self.proxy.asserted_post_address = f"example/{namespace}"
+        self.proxy.asserted_post_data = data
+        ret = self.api.create(namespace, data)
+        self.assertEqual(ret, self.proxy.post_ret)
+
+    def test_delete(self):
+        self.proxy.delete_ret = "hallo"
+        namespace = "ns1"
+        identifier = "8"
+        self.proxy.asserted_delete_address = f"example/{namespace}/{identifier}"
+        ret = self.api.delete(namespace, identifier)
+        self.assertEqual(ret, self.proxy.delete_ret)
+
+
+class ExampleNotNamespacedApi2(NotNamespacedApi):
+    list_url = "example"
+    detail_url = "example/{identifier}"
+
+
+class NotNamespacedApiTestCase(unittest.TestCase):
+    def setUp(self) -> None:
+        self.proxy = ProxyMock("/api")
+        self.proxy.test = self
+        self.api = ExampleNotNamespacedApi2(self.proxy)
+
+    def test_get_list(self):
+        self.proxy.get_ret = "hallo"
+        self.proxy.asserted_get_address = f"example"
+        ret = self.api.get_list()
+        self.assertEqual(ret, self.proxy.get_ret)
+
+    def test_get(self):
+        self.proxy.get_ret = "hallo"
+        identifier = "8"
+        self.proxy.asserted_get_address = f"example/{identifier}"
+        ret = self.api.get(identifier)
+        self.assertEqual(ret, self.proxy.get_ret)
+
+    def test_create(self):
+        self.proxy.post_ret = "hallo"
+        data = "data"
+        self.proxy.asserted_post_address = f"example"
+        self.proxy.asserted_post_data = data
+        ret = self.api.create(data)
+        self.assertEqual(ret, self.proxy.post_ret)
+
+    def test_delete(self):
+        self.proxy.delete_ret = "hallo"
+        identifier = "8"
+        self.proxy.asserted_delete_address = f"example/{identifier}"
+        ret = self.api.delete(identifier)
+        self.assertEqual(ret, self.proxy.delete_ret)
+
+
+class NamespaceTestCase(unittest.TestCase):
+    def setUp(self) -> None:
+        self.proxy = ProxyMock("/api")
+        self.proxy.test = self
+        self.api = Namespace(self.proxy)
+
+    def test_get_list(self):
+        self.proxy.asserted_get_address = "/api/v1/namespaces"
+        self.api.get_list()
+
+    def test_get(self):
+        identifier = "7"
+        self.proxy.asserted_get_address = f"/api/v1/namespaces/{identifier}"
+        self.api.get(identifier)
+
+    def test_create(self):
+        data = "data"
+        self.proxy.asserted_post_data = data
+        self.proxy.asserted_post_address = "/api/v1/namespaces"
+        self.api.create(data)
+
+    def test_delete(self):
+        identifier = "7"
+        self.proxy.asserted_delete_address = f"/api/v1/namespaces/{identifier}"
+        self.api.delete(identifier)
+
+
+class VirtualMachineInstanceTestCase(unittest.TestCase):
+    def setUp(self) -> None:
+        self.proxy = ProxyMock("/api")
+        self.proxy.test = self
+        self.api = VirtualMachineInstance(self.proxy)
+
+    def test_get_list(self):
+        namespace = "ns1"
+        self.proxy.asserted_get_address = f"/apis/kubevirt.io/v1alpha3/namespaces/{namespace}/virtualmachineinstances/"
+        self.api.get_list(namespace)
+
+    def test_get(self):
+        identifier = "7"
+        namespace = "ns1"
+        self.proxy.asserted_get_address = f"/apis/kubevirt.io/v1alpha3/namespaces/{namespace}/virtualmachineinstances/{identifier}"
+        self.api.get(namespace, identifier)
+
+    def test_create(self):
+        data = "data"
+        namespace = "ns1"
+        self.proxy.asserted_post_data = data
+        self.proxy.asserted_post_address = f"/apis/kubevirt.io/v1alpha3/namespaces/{namespace}/virtualmachineinstances/"
+        self.api.create(namespace, data)
+
+    def test_delete(self):
+        identifier = "7"
+        namespace = "ns1"
+        self.proxy.asserted_delete_address = f"/apis/kubevirt.io/v1alpha3/namespaces/{namespace}/virtualmachineinstances/{identifier}"
+        self.api.delete(namespace, identifier)
+
+
+class NetworkPolicyTestCase(unittest.TestCase):
+    def setUp(self) -> None:
+        self.proxy = ProxyMock("/api")
+        self.proxy.test = self
+        self.api = NetworkPolicy(self.proxy)
+
+    def test_get_list(self):
+        namespace = "ns1"
+        self.proxy.asserted_get_address = f"/apis/networking.k8s.io/v1/namespaces/{namespace}/networkpolicies"
+        self.api.get_list(namespace)
+
+    def test_get(self):
+        identifier = "7"
+        namespace = "ns1"
+        self.proxy.asserted_get_address = f"/apis/networking.k8s.io/v1/namespaces/{namespace}/networkpolicies/{identifier}"
+        self.api.get(namespace, identifier)
+
+    def test_create(self):
+        data = "data"
+        namespace = "ns1"
+        self.proxy.asserted_post_data = data
+        self.proxy.asserted_post_address = f"/apis/networking.k8s.io/v1/namespaces/{namespace}/networkpolicies"
+        self.api.create(namespace, data)
+
+    def test_delete(self):
+        identifier = "7"
+        namespace = "ns1"
+        self.proxy.asserted_delete_address = f"/apis/networking.k8s.io/v1/namespaces/{namespace}/networkpolicies/{identifier}"
+        self.api.delete(namespace, identifier)
