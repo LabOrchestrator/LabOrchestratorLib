@@ -168,9 +168,8 @@ class LabInstanceController(AdapterController):
         # now delete local object
         super().delete(lab_instance.primary_key)
 
-    def get_list_of_user(self, user: User):
-        # TODO list instead of item
-        lab_instances = self.adapter.filter_by(user_id=user.primary_key)
+    def get_list_of_user(self, user: User) -> List[LabInstance]:
+        lab_instances = self.adapter.filter(user_id=user.primary_key)
         return lab_instances
 
     def save(self, obj: LabInstance) -> LabInstance:
