@@ -25,5 +25,5 @@ class AdapterController(Generic[Adapter, LibModelType]):
     def save(self, obj: LibModelType) -> LibModelType:
         return self.adapter.save(obj)
 
-    def filter(self, **kwargs) -> LibModelType:
+    def filter(self, **kwargs) -> List[LibModelType]:
         return self.adapter.filter(**kwargs)
