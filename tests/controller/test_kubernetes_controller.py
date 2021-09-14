@@ -1,18 +1,10 @@
 import unittest
-from typing import Tuple, Optional
 
 from lab_orchestrator_lib.controller.kubernetes_controller import KubernetesController, NamespacedController, \
     NotNamespacedController
 
-from lab_orchestrator_lib.kubernetes.api import APIRegistry, NamespacedApi, add_api_namespaced, Proxy, NotNamespacedApi
-from tests.kubernetes.mockups import ProxyMock
-
-
-def get_mocked_registry(test_case: unittest.TestCase) -> Tuple[ProxyMock, APIRegistry]:
-    proxy = ProxyMock("/api")
-    proxy.test = test_case
-    registry = APIRegistry(proxy)
-    return proxy, registry
+from lab_orchestrator_lib.kubernetes.api import NamespacedApi, NotNamespacedApi
+from tests.controller.mockup import get_mocked_registry
 
 
 class KubernetesControllerTestCase(unittest.TestCase):
