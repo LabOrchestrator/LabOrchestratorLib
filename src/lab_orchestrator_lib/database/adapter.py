@@ -34,7 +34,7 @@ class DockerImageAdapterInterface:
     def save(self, obj: DockerImage) -> DockerImage:
         raise NotImplementedError()
 
-    def filter(self, **kwargs: Dict[str, Any]) -> DockerImage:
+    def filter(self, **kwargs: Dict[str, Any]) -> List[DockerImage]:
         raise NotImplementedError()
 
 
@@ -58,7 +58,7 @@ class LabAdapterInterface:
     def save(self, obj: Lab) -> Lab:
         raise NotImplementedError()
 
-    def filter(self, **kwargs: Dict[str, Any]) -> Lab:
+    def filter(self, **kwargs: Dict[str, Any]) -> List[Lab]:
         raise NotImplementedError()
 
 
@@ -81,5 +81,5 @@ class LabInstanceAdapterInterface:
     def save(self, obj: LabInstance) -> LabInstance:
         raise NotImplementedError()
 
-    def filter(self, **kwargs: Dict[str, Any]) -> LabInstance:
+    def filter(self, **kwargs: Dict[str, Any]) -> List[LabInstance]:
         raise NotImplementedError()
