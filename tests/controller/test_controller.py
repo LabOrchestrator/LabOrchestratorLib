@@ -1,10 +1,11 @@
 import unittest
+from typing import Dict, Any
 
 from lab_orchestrator_lib.template_engine import TemplateEngine, DataType
 
 from lab_orchestrator_lib.kubernetes.api import Namespace, NetworkPolicy, VirtualMachineInstance
 
-from lab_orchestrator_lib.model.model import User, DockerImage, Lab, Identifier, LabInstance
+from lab_orchestrator_lib.model.model import User, DockerImage, Lab, Identifier, LabInstance, LabInstanceKubernetes
 
 from lab_orchestrator_lib.controller.controller import UserController, NamespaceController, NetworkPolicyController, \
     DockerImageController, VirtualMachineInstanceController, LabController, LabInstanceController
@@ -120,6 +121,32 @@ class DockerImageControllerTestCase(unittest.TestCase):
                 return expected
         ctrl = DockerImageController(ExampleDockerImageAdapterInterface())
         ret = ctrl.create(expected.name, expected.description, expected.url)
+        self.assertEqual(ret, expected)
+
+
+class LabControllerTestCase(unittest.TestCase):
+    def test_init(self):
+        class ExampleLabAdapterInterface(LabAdapterInterface):
+            pass
+        expected = ExampleLabAdapterInterface()
+        ctrl = LabController(expected)
+        self.assertEqual(ctrl.adapter, expected)
+
+    def test_create(self):
+        this = self
+        expected = Lab("8", "lab", "lab", "desc", "10", "ubuntu")
+        class ExampleLabAdapterInterface(LabAdapterInterface):
+            def create(self, name: str, namespace_prefix: str, description: str, docker_image_id: Identifier,
+                       docker_image_name: str) -> Lab:
+                this.assertEqual(name, expected.name)
+                this.assertEqual(namespace_prefix, expected.namespace_prefix)
+                this.assertEqual(description, expected.description)
+                this.assertEqual(docker_image_id, expected.docker_image_id)
+                this.assertEqual(docker_image_name, expected.docker_image_name)
+                return expected
+        ctrl = LabController(ExampleLabAdapterInterface())
+        ret = ctrl.create(expected.name, expected.namespace_prefix, expected.description,
+                          expected.docker_image_id, expected.docker_image_name)
         self.assertEqual(ret, expected)
 
 
@@ -277,28 +304,213 @@ class VirtualMachineInstanceControllerTestCase(unittest.TestCase):
         self.assertEqual(ret, expected)
 
 
-class LabControllerTestCase(unittest.TestCase):
+class LabInstanceControllerTestCase(unittest.TestCase):
+    def setUp(self) -> None:
+        self.proxy, self.registry = get_mocked_registry(self)
+
     def test_init(self):
-        class ExampleLabAdapterInterface(LabAdapterInterface):
+        class ExampleLabInstanceAdapter(LabInstanceAdapterInterface):
             pass
-        expected = ExampleLabAdapterInterface()
-        ctrl = LabController(expected)
-        self.assertEqual(ctrl.adapter, expected)
+        lab_instance_adapter = ExampleLabInstanceAdapter()
+        user_ctrl = UserController(UserAdapterInterface())
+        namespace_ctrl = NamespaceController(self.registry)
+        namespace_ctrl._api = lambda: None
+        network_policy_ctrl = NetworkPolicyController(self.registry)
+        network_policy_ctrl._api = lambda: None
+        lab_ctrl = LabController(LabAdapterInterface())
+        docker_image_ctrl = DockerImageController(DockerImageAdapterInterface())
+        vmi_ctrl = VirtualMachineInstanceController(self.registry, namespace_ctrl, docker_image_ctrl)
+        lab_instance_ctrl = LabInstanceController(
+            adapter=lab_instance_adapter, virtual_machine_instance_ctrl=vmi_ctrl, namespace_ctrl=namespace_ctrl,
+            lab_ctrl=lab_ctrl, network_policy_ctrl=network_policy_ctrl, user_ctrl=user_ctrl, secret_key="secret"
+        )
+        self.assertIsInstance(lab_instance_ctrl, LabInstanceController)
+
+    def test_get_namespace_name(self):
+        expected_lab = Lab("3", "name", "prefix", "desc", "2", "ubuntu")
+        expected_lab_instance = LabInstance("8", "9", "10")
+        expected_namespace_name = f"{expected_lab.namespace_prefix}-{expected_lab_instance.user_id}-{expected_lab_instance.primary_key}"
+        namespace_ctrl = NamespaceController(self.registry)
+        namespace_ctrl._api = lambda: None
+        network_policy_ctrl = NetworkPolicyController(self.registry)
+        network_policy_ctrl._api = lambda: None
+        lab_ctrl = LabController(LabAdapterInterface())
+
+        def lab_ctrl_get(identifier):
+            self.assertEqual(expected_lab_instance.lab_id, identifier)
+            return expected_lab
+
+        lab_ctrl.get = lab_ctrl_get
+        namespace_name = LabInstanceController.get_namespace_name(expected_lab_instance, lab_ctrl)
+        self.assertEqual(namespace_name, expected_namespace_name)
+
+    def test_gen_namespace_name(self):
+        expected_lab = Lab("3", "name", "prefix", "desc", "2", "ubuntu")
+        expected_lab_instance = LabInstance("8", "9", "10")
+        expected_namespace_name = f"{expected_lab.namespace_prefix}-{expected_lab_instance.user_id}-{expected_lab_instance.primary_key}"
+        namespace_ctrl = NamespaceController(self.registry)
+        namespace_ctrl._api = lambda: None
+        network_policy_ctrl = NetworkPolicyController(self.registry)
+        network_policy_ctrl._api = lambda: None
+        lab_ctrl = LabController(LabAdapterInterface())
+
+        def lab_ctrl_get(identifier):
+            self.assertEqual(expected_lab_instance.lab_id, identifier)
+            return expected_lab
+
+        lab_ctrl.get = lab_ctrl_get
+        namespace_name = LabInstanceController.get_namespace_name(expected_lab_instance, lab_ctrl)
+        self.assertEqual(namespace_name, expected_namespace_name)
 
     def test_create(self):
         this = self
-        expected = Lab("8", "lab", "lab", "desc", "10", "ubuntu")
-        class ExampleLabAdapterInterface(LabAdapterInterface):
-            def create(self, name: str, namespace_prefix: str, description: str, docker_image_id: Identifier,
-                       docker_image_name: str) -> Lab:
-                this.assertEqual(name, expected.name)
-                this.assertEqual(namespace_prefix, expected.namespace_prefix)
-                this.assertEqual(description, expected.description)
-                this.assertEqual(docker_image_id, expected.docker_image_id)
-                this.assertEqual(docker_image_name, expected.docker_image_name)
-                return expected
-        ctrl = LabController(ExampleLabAdapterInterface())
-        ret = ctrl.create(expected.name, expected.namespace_prefix, expected.description,
-                          expected.docker_image_id, expected.docker_image_name)
-        self.assertEqual(ret, expected)
+        expected_lab_id = "3"
+        expected_user_id = "5"
+        expected_lab = Lab("3", "name", "prefix", "desc", "8", "ubuntu")
+        expected_user = User("5")
+        expected_lab_instance = LabInstance("6", "7", "8")
+        expected_namespace_name = f"{expected_lab.namespace_prefix}-{expected_user_id}-{expected_lab_instance.primary_key}"
 
+        class ExampleLabInstanceAdapter(LabInstanceAdapterInterface):
+            def create(self, lab_id: Identifier, user_id: Identifier) -> LabInstance:
+                this.assertEqual(lab_id, expected_lab_id)
+                this.assertEqual(user_id, expected_user_id)
+                return expected_lab_instance
+
+        lab_instance_adapter = ExampleLabInstanceAdapter()
+        user_ctrl = UserController(UserAdapterInterface())
+
+        def user_ctrl_get(identifier):
+            self.assertEqual(identifier, expected_user_id)
+            return expected_user
+
+        user_ctrl.get = user_ctrl_get
+
+        def namespace_ctrl_create(namespace_name):
+            self.assertEqual(namespace_name, expected_namespace_name)
+            return "success"
+
+        namespace_ctrl = NamespaceController(self.registry)
+        namespace_ctrl._api = lambda: None
+        namespace_ctrl.create = namespace_ctrl_create
+
+        def network_policy_ctrl_create(namespace_name):
+            self.assertEqual(namespace_name, expected_namespace_name)
+            return "success"
+
+        network_policy_ctrl = NetworkPolicyController(self.registry)
+        network_policy_ctrl._api = lambda: None
+        network_policy_ctrl.create = network_policy_ctrl_create
+
+        def lab_ctrl_get(identifier):
+            self.assertEqual(identifier, expected_lab_id)
+            return expected_lab
+
+        lab_ctrl = LabController(LabAdapterInterface())
+        lab_ctrl.get = lab_ctrl_get
+        docker_image_ctrl = DockerImageController(DockerImageAdapterInterface())
+
+        def vmi_ctrl_create(namespace_name, lab):
+            self.assertEqual(namespace_name, expected_namespace_name)
+            self.assertEqual(lab, expected_lab)
+            return "success"
+
+        vmi_ctrl = VirtualMachineInstanceController(self.registry, namespace_ctrl, docker_image_ctrl)
+        vmi_ctrl.create = vmi_ctrl_create
+        lab_instance_ctrl = LabInstanceController(
+            adapter=lab_instance_adapter, virtual_machine_instance_ctrl=vmi_ctrl, namespace_ctrl=namespace_ctrl,
+            lab_ctrl=lab_ctrl, network_policy_ctrl=network_policy_ctrl, user_ctrl=user_ctrl, secret_key="secret"
+        )
+        lab_instance_kubernetes = lab_instance_ctrl.create(expected_lab_id, expected_user_id)
+        self.assertIsInstance(lab_instance_kubernetes, LabInstanceKubernetes)
+        self.assertEqual(expected_lab_id, lab_instance_kubernetes.lab_id)
+        self.assertEqual(expected_user_id, lab_instance_kubernetes.user_id)
+        self.assertEqual(expected_lab_instance.primary_key, lab_instance_kubernetes.primary_key)
+
+    def test_delete(self):
+        this = self
+        expected_lab_id = "3"
+        expected_user_id = "5"
+        expected_lab = Lab("3", "name", "prefix", "desc", "8", "ubuntu")
+        expected_user = User(expected_user_id)
+        expected_lab_instance = LabInstance("6", "3", "5")
+        expected_namespace_name = f"{expected_lab.namespace_prefix}-{expected_user_id}-{expected_lab_instance.primary_key}"
+
+        class ExampleLabInstanceAdapter(LabInstanceAdapterInterface):
+            def delete(self, identifier: Identifier) -> None:
+                this.assertEqual(identifier, expected_lab_instance.primary_key)
+                return None
+
+        lab_instance_adapter = ExampleLabInstanceAdapter()
+
+        def namespace_ctrl_delete(namespace_name):
+            self.assertEqual(namespace_name, expected_namespace_name)
+            return None
+
+        namespace_ctrl = NamespaceController(self.registry)
+        namespace_ctrl._api = lambda: None
+        namespace_ctrl.delete = namespace_ctrl_delete
+
+        def lab_ctrl_get(identifier):
+            self.assertEqual(identifier, expected_lab_id)
+            return expected_lab
+
+        lab_ctrl = LabController(LabAdapterInterface())
+        lab_ctrl.get = lab_ctrl_get
+
+        user_ctrl = UserController(UserAdapterInterface())
+        network_policy_ctrl = NetworkPolicyController(self.registry)
+        network_policy_ctrl._api = lambda: None
+        docker_image_ctrl = DockerImageController(DockerImageAdapterInterface())
+        vmi_ctrl = VirtualMachineInstanceController(self.registry, namespace_ctrl, docker_image_ctrl)
+
+        ctrl = LabInstanceController(
+            adapter=lab_instance_adapter, virtual_machine_instance_ctrl=vmi_ctrl, namespace_ctrl=namespace_ctrl,
+            lab_ctrl=lab_ctrl, network_policy_ctrl=network_policy_ctrl, user_ctrl=user_ctrl, secret_key="secret"
+        )
+        ctrl.delete(expected_lab_instance)
+        self.assertTrue(True)
+
+
+    def test_get_list_of_user(self):
+        this = self
+        expected_lab_instance = LabInstance("2", "3", "1")
+        expected_user = User("1")
+        class ExampleLabInstanceAdapter(LabInstanceAdapterInterface):
+            def filter(self, **kwargs: Dict[str, Any]) -> LabInstance:
+                this.assertDictEqual(kwargs, {'user_id': expected_user.primary_key})
+                return expected_lab_instance
+        lab_instance_adapter = ExampleLabInstanceAdapter()
+        namespace_ctrl = NamespaceController(self.registry)
+        lab_ctrl = LabController(LabAdapterInterface())
+        user_ctrl = UserController(UserAdapterInterface())
+        network_policy_ctrl = NetworkPolicyController(self.registry)
+        docker_image_ctrl = DockerImageController(DockerImageAdapterInterface())
+        vmi_ctrl = VirtualMachineInstanceController(self.registry, namespace_ctrl, docker_image_ctrl)
+
+        ctrl = LabInstanceController(
+            adapter=lab_instance_adapter, virtual_machine_instance_ctrl=vmi_ctrl, namespace_ctrl=namespace_ctrl,
+            lab_ctrl=lab_ctrl, network_policy_ctrl=network_policy_ctrl, user_ctrl=user_ctrl, secret_key="secret"
+        )
+        ret = ctrl.get_list_of_user(expected_user)
+        self.assertEqual(ret, expected_lab_instance)
+
+    def test_save(self):
+        class ExampleLabInstanceAdapter(LabInstanceAdapterInterface):
+            pass
+        lab_instance_adapter = ExampleLabInstanceAdapter()
+        user_ctrl = UserController(UserAdapterInterface())
+        namespace_ctrl = NamespaceController(self.registry)
+        namespace_ctrl._api = lambda: None
+        network_policy_ctrl = NetworkPolicyController(self.registry)
+        network_policy_ctrl._api = lambda: None
+        lab_ctrl = LabController(LabAdapterInterface())
+        docker_image_ctrl = DockerImageController(DockerImageAdapterInterface())
+        vmi_ctrl = VirtualMachineInstanceController(self.registry, namespace_ctrl, docker_image_ctrl)
+        lab_instance_ctrl = LabInstanceController(
+            adapter=lab_instance_adapter, virtual_machine_instance_ctrl=vmi_ctrl, namespace_ctrl=namespace_ctrl,
+            lab_ctrl=lab_ctrl, network_policy_ctrl=network_policy_ctrl, user_ctrl=user_ctrl, secret_key="secret"
+        )
+        lab_instance = LabInstance("8", "9", "10")
+        with self.assertRaises(Exception) as e:
+            lab_instance_ctrl.save(lab_instance)
