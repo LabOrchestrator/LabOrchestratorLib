@@ -1,5 +1,6 @@
-from typing import List
+from typing import List, Optional
 
+from lab_orchestrator_lib.template_engine import TemplateEngine
 from lab_orchestrator_lib_auth.auth import generate_auth_token, LabInstanceTokenParams
 from lab_orchestrator_lib.controller.adapter_controller import AdapterController
 from lab_orchestrator_lib.controller.kubernetes_controller import NamespacedController, NotNamespacedController
@@ -38,8 +39,8 @@ class NetworkPolicyController(NamespacedController):
     def _api(self) -> NamespacedApi:
         return self.registry.network_policy
 
-    def __init__(self, registry: APIRegistry):
-        super().__init__(registry)
+    def __init__(self, registry: APIRegistry, template_engine: Optional[TemplateEngine] = None):
+        super().__init__(registry, template_engine)
         self.default_name = "allow-same-namespace"
 
     def create(self, namespace):
@@ -60,8 +61,9 @@ class VirtualMachineInstanceController(NamespacedController):
     template_file = 'vmi_template.yaml'
 
     def __init__(self, registry: APIRegistry, namespace_ctrl: NamespaceController,
-                 docker_image_ctrl: DockerImageController):
-        super().__init__(registry)
+                 docker_image_ctrl: DockerImageController,
+                 template_engine: Optional[TemplateEngine] = None):
+        super().__init__(registry, template_engine)
         self.namespace_ctrl = namespace_ctrl
         self.docker_image_ctrl = docker_image_ctrl
 
