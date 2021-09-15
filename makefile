@@ -23,3 +23,6 @@ git-release:
 	git push --tags
 
 release: git-tag git-release pypi-build pypi-push
+
+test:
+	PYTHONPATH=src python3 -m unittest discover -s tests -p 'test_*.py'

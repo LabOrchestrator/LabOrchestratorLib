@@ -1,5 +1,6 @@
-from typing import List
+from typing import List, Optional
 
+from lab_orchestrator_lib.template_engine import TemplateEngine
 from lab_orchestrator_lib_auth.auth import generate_auth_token, LabInstanceTokenParams
 from lab_orchestrator_lib.controller.adapter_controller import AdapterController
 from lab_orchestrator_lib.controller.kubernetes_controller import NamespacedController, NotNamespacedController
@@ -38,8 +39,8 @@ class NetworkPolicyController(NamespacedController):
     def _api(self) -> NamespacedApi:
         return self.registry.network_policy
 
-    def __init__(self, registry: APIRegistry):
-        super().__init__(registry)
+    def __init__(self, registry: APIRegistry, template_engine: Optional[TemplateEngine] = None):
+        super().__init__(registry, template_engine)
         self.default_name = "allow-same-namespace"
 
     def create(self, namespace):
@@ -56,12 +57,23 @@ class DockerImageController(AdapterController):
         return self.adapter.create(name, description, url)
 
 
+class LabController(AdapterController):
+    def __init__(self, adapter: LabAdapterInterface):
+        super().__init__(adapter)
+
+    def create(self, name: str, namespace_prefix: str, description: str, docker_image_id: Identifier,
+               docker_image_name: str) -> Lab:
+        return self.adapter.create(name=name, namespace_prefix=namespace_prefix, description=description,
+                                   docker_image_id=docker_image_id, docker_image_name=docker_image_name)
+
+
 class VirtualMachineInstanceController(NamespacedController):
     template_file = 'vmi_template.yaml'
 
     def __init__(self, registry: APIRegistry, namespace_ctrl: NamespaceController,
-                 docker_image_ctrl: DockerImageController):
-        super().__init__(registry)
+                 docker_image_ctrl: DockerImageController,
+                 template_engine: Optional[TemplateEngine] = None):
+        super().__init__(registry, template_engine)
         self.namespace_ctrl = namespace_ctrl
         self.docker_image_ctrl = docker_image_ctrl
 
@@ -76,26 +88,16 @@ class VirtualMachineInstanceController(NamespacedController):
         data = self._get_template(template_data)
         return self._api().create(namespace, data)
 
-    def get_list_of_lab_instance(self, lab_instance: LabInstance, lab_instance_ctrl: 'LabInstanceController'):
-        namespace_name = LabInstanceController.get_namespace_name(lab_instance, lab_instance_ctrl)
+    def get_list_of_lab_instance(self, lab_instance: LabInstance, lab_ctrl: LabController):
+        namespace_name = LabInstanceController.get_namespace_name(lab_instance, lab_ctrl)
         namespace = self.namespace_ctrl.get(namespace_name)
         return self.get_list(namespace_name)
 
     def get_of_lab_instance(self, lab_instance: LabInstance, virtual_machine_instance_id,
-                            lab_instance_ctrl: 'LabInstanceController'):
-        namespace_name = LabInstanceController.get_namespace_name(lab_instance, lab_instance_ctrl)
+                            lab_ctrl: LabController):
+        namespace_name = LabInstanceController.get_namespace_name(lab_instance, lab_ctrl)
         namespace = self.namespace_ctrl.get(namespace_name)
         return self.get(namespace_name, virtual_machine_instance_id)
-
-
-class LabController(AdapterController):
-    def __init__(self, adapter: LabAdapterInterface):
-        super().__init__(adapter)
-
-    def create(self, name: str, namespace_prefix: str, description: str, docker_image_id: Identifier,
-               docker_image_name: str) -> Lab:
-        return self.adapter.create(name=name, namespace_prefix=namespace_prefix, description=description,
-                                   docker_image_id=docker_image_id, docker_image_name=docker_image_name)
 
 
 class LabInstanceController(AdapterController):
@@ -116,8 +118,8 @@ class LabInstanceController(AdapterController):
         self.secret_key = secret_key
 
     @staticmethod
-    def get_namespace_name(lab_instance: LabInstance, lab_instance_ctrl):
-        lab = lab_instance_ctrl.get(lab_instance.lab_id)
+    def get_namespace_name(lab_instance: LabInstance, lab_ctrl: LabController):
+        lab = lab_ctrl.get(lab_instance.lab_id)
         return LabInstanceController.gen_namespace_name(lab, lab_instance.user_id, lab_instance.primary_key)
 
     @staticmethod
@@ -154,7 +156,7 @@ class LabInstanceController(AdapterController):
         #    self.adapter.delete(lab_instance.primary_key)
         #    self.namespace_ctrl.delete(namespace_name)
         #    raise Exception
-        lab_instance_token_params = LabInstanceTokenParams(lab_id, lab_instance.id, namespace_name,
+        lab_instance_token_params = LabInstanceTokenParams(lab_id, lab_instance.primary_key, namespace_name,
                                                            [lab.docker_image_name])
         token = generate_auth_token(user_id=user_id, lab_instance_token_params=lab_instance_token_params,
                                     secret_key=self.secret_key)
@@ -170,7 +172,7 @@ class LabInstanceController(AdapterController):
 
     def get_list_of_user(self, user: User):
         # TODO list instead of item
-        lab_instances = self.adapter.filter_by(user_id=user.primary_key)
+        lab_instances = self.adapter.filter(user_id=user.primary_key)
         return lab_instances
 
     def save(self, obj: LabInstance) -> LabInstance:

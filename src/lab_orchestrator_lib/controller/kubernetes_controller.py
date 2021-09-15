@@ -1,3 +1,5 @@
+from typing import Optional
+
 from lab_orchestrator_lib.kubernetes.api import APIRegistry, NamespacedApi, NotNamespacedApi
 from lab_orchestrator_lib.template_engine import TemplateEngine
 
@@ -5,11 +7,15 @@ from lab_orchestrator_lib.template_engine import TemplateEngine
 class KubernetesController:
     template_file = None
 
-    def __init__(self, registry: APIRegistry):
+    def __init__(self, registry: APIRegistry, template_engine: Optional[TemplateEngine] = None):
         self.registry = registry
+        if template_engine is None:
+            self.template_engine = TemplateEngine()
+        else:
+            self.template_engine = template_engine
 
     def _get_template(self, template_data) -> str:
-        return TemplateEngine().replace_template(template=self.template_file, data=template_data)
+        return self.template_engine.replace_template(template=self.template_file, data=template_data)
 
 
 class NamespacedController(KubernetesController):
