@@ -156,7 +156,7 @@ class LabInstanceController(AdapterController):
         #    self.adapter.delete(lab_instance.primary_key)
         #    self.namespace_ctrl.delete(namespace_name)
         #    raise Exception
-        lab_instance_token_params = LabInstanceTokenParams(lab_id, lab_instance.id, namespace_name,
+        lab_instance_token_params = LabInstanceTokenParams(lab_id, lab_instance.primary_key, namespace_name,
                                                            [lab.docker_image_name])
         token = generate_auth_token(user_id=user_id, lab_instance_token_params=lab_instance_token_params,
                                     secret_key=self.secret_key)
@@ -172,7 +172,7 @@ class LabInstanceController(AdapterController):
 
     def get_list_of_user(self, user: User):
         # TODO list instead of item
-        lab_instances = self.adapter.filter_by(user_id=user.primary_key)
+        lab_instances = self.adapter.filter(user_id=user.primary_key)
         return lab_instances
 
     def save(self, obj: LabInstance) -> LabInstance:
