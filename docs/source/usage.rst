@@ -32,7 +32,7 @@ The second type is database resources. They are saved in the database. For every
 
 A ``DockerImage`` is a link to a docker image that contains the VM image. A ``Lab`` contains one or multiple (currently not supported) VMs, each one is linked to a ``DockerImage``. A lab can be started which results into a ``LabInstance``. A ``LabInstance`` contains some ``VirtualMachineInstances`` running in a ``Namespace`` that can be accessed with VNC. The ``LabInstances`` are separated from other ``LabInstances`` with ``NetworkPolicys``.
 
-See more at the :doc:`models` documentation.
+See more at the :doc:`model` documentation.
 
 Controller
 ----------
@@ -40,6 +40,8 @@ Controller
 This library makes use of something called controllers. A controller is a class that controls one resource. The controllers can (and should) be used to create, get and update resources.
 
 A controller collection is a collection of all controllers. You can create one with the ``lab_orchestrator_lib.controllers.controller_collection.create_controller_collection(...)`` function. This function takes all adapters, one api registry and a secret key for creating JWT tokens as parameter. The api registry is needed for the Kubernetes controllers and the adapters are injected into the database controllers.
+
+See more at the :doc:`controller` documentation.
 
 Usage
 -----
