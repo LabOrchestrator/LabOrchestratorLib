@@ -288,6 +288,16 @@ class LabInstanceController(AdapterController):
         return f"{lab.namespace_prefix}-{user_id}-{lab_instance_id}"
 
     def create(self, lab_id: Identifier, user_id: Identifier) -> LabInstanceKubernetes:
+        """Creates a lab instance.
+
+        Creating a lab instance is equivalent to starting a lab for a user. This contains creating a namespace, a
+        network policy in the namespace and one or more virtual machine instances. In addition to this a JWT token
+        will be created with that the user is able to connect to the virtual machine instances through the LabVNC.
+
+        :param lab_id: The id of the lab.
+        :param user_id: The id of the user.
+        :return: Returns a lab instance kubernetes object.
+        """
         lab = self.lab_ctrl.get(lab_id)
         if lab is None:
             # TODO sinnvolle exception werfen
@@ -323,7 +333,14 @@ class LabInstanceController(AdapterController):
                                     secret_key=self.secret_key)
         return LabInstanceKubernetes(primary_key=lab_instance.primary_key, lab_id=lab_id, user_id=user_id, jwt_token=token)
 
-    def delete(self, lab_instance: LabInstance):
+    def delete(self, lab_instance: LabInstance) -> None:
+        """Deletes a lab instance.
+
+        This also deletes the created namespace with all resources that are contained in this namespace.
+
+        :param lab_instance: The lab instance that should be deleted.
+        :return: None
+        """
         lab = self.lab_ctrl.get(lab_instance.lab_id)
         namespace_name = LabInstanceController.gen_namespace_name(lab, lab_instance.user_id, lab_instance.primary_key)
         # this also deletes VMIs and all other resources in the namespace
@@ -332,9 +349,15 @@ class LabInstanceController(AdapterController):
         super().delete(lab_instance.primary_key)
 
     def get_list_of_user(self, user: User):
+        """Gives a list of lab instances that belong to a specific user.
+
+        :param user: The user that belongs to the lab instances.
+        :return: A list of lab instances that belongs to the user.
+        """
         # TODO list instead of item
         lab_instances = self.adapter.filter(user_id=user.primary_key)
         return lab_instances
 
     def save(self, obj: LabInstance) -> LabInstance:
+        """Removes the inherited save method, because lab instances can't be changed."""
         raise Exception("LabInstances can't be mutated.")
