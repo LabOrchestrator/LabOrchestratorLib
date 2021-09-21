@@ -21,13 +21,9 @@ Contents
 --------
 
 .. toctree::
+    :maxdepth: 1
 
-   usage
-   model
-   adapter
-   controller
-   kubernetes
-   templates
-   templateengine
-   customexceptions
-   api
+    usage
+    users
+    developer
+    api
