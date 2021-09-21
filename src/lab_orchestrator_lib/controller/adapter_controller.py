@@ -8,7 +8,11 @@ LibModelType = TypeVar('LibModelType', DockerImage, Lab, LabInstance)  # subclas
 
 
 class AdapterController(Generic[Adapter, LibModelType]):
-    """Generic controller for adapter classes."""
+    """Generic controller for adapter classes.
+
+    This generic class implements some of the methods that are needed for a adapter controller. Whats missing is the
+    create method and some specific methods that can't be abstracted.
+    """
 
     def __init__(self, adapter: Adapter):
         """Initializes an adapter controller.
