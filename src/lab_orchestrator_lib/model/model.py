@@ -42,6 +42,7 @@ class DockerImage(Model):
         :param name: The name of the docker image. (max. 32 chars)
         :param description: A short description of the docker image. (max. 128 chars)
         :param url: The url to the image. (max. 256 chars)
+        :raise ValidationError: if one of the parameters has an invalid value.
         """
         super().__init__(primary_key)
         if len(name) > 32:
@@ -72,6 +73,7 @@ class Lab(Model):
         :param description: A short description of the docker image. (max. 128 chars)
         :param docker_image_id: The id of the docker image that should be used in this lab.
         :param docker_image_name: The name of the VM. (used when connecting to the VM) (max. 32 chars)
+        :raise ValidationError: if one of the parameters has an invalid value.
         """
         super().__init__(primary_key)
         if len(name) > 32:

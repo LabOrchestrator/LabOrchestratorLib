@@ -297,6 +297,7 @@ class LabInstanceController(AdapterController):
         :param lab_id: The id of the lab.
         :param user_id: The id of the user.
         :return: Returns a lab instance kubernetes object.
+        :raise Exception: if parameters are invalid.
         """
         lab = self.lab_ctrl.get(lab_id)
         if lab is None:
@@ -359,5 +360,8 @@ class LabInstanceController(AdapterController):
         return lab_instances
 
     def save(self, obj: LabInstance) -> LabInstance:
-        """Removes the inherited save method, because lab instances can't be changed."""
+        """Removes the inherited save method, because lab instances can't be changed.
+
+        :raise Exception: Always.
+        """
         raise Exception("LabInstances can't be mutated.")

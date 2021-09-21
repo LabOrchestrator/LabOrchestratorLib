@@ -49,6 +49,7 @@ class NamespacedController(KubernetesController):
         """Gives an instance of the namespaced api that is used in this controller.
 
         :return: An instance of the namespaced api.
+        :raise NotImplementedError: Method needs to be implemented.
         """
         raise NotImplementedError()
 
@@ -89,6 +90,7 @@ class NotNamespacedController(KubernetesController):
         """Gives an instance of the not namespaced api that is used in this controller.
 
         :return: An instance of the not namespaced api.
+        :raise NotImplementedError: Method needs to be implemented.
         """
         raise NotImplementedError()
 
