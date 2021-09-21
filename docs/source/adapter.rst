@@ -16,6 +16,7 @@ Take a look at the controller references to see which adapters you need when you
 .. note::
     The `LabOrchestratorLib-FlaskSQLAlchemyAdapter <https://github.com/LabOrchestrator/LabOrchestratorLib-FlaskSQLAlchemyAdapter>`_ project is not maintained and not working, but if you need an adapter for Flask-SQLAlchemy you can base them on this project.
 
+After implementing the adapters you can create a controller collection by passing instances of the adapters to the ``lab_orchestrator_lib.controllers.controller_collection.create_controller_collection(...)`` function. This function takes all adapters, one api registry and a secret key. More about this is part of :doc:`controller` documentation.
 
 User Adapter Interface
 ----------------------

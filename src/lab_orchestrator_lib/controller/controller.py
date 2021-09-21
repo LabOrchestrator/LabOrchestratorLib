@@ -22,18 +22,31 @@ from lab_orchestrator_lib.model.model import DockerImage, Lab, LabInstance, Iden
 class UserController:
     """User controller.
 
-    This is the only controller that has no create methods because the lab orchestrator lib doesn't create users. It's
+    This is the only controller that has no create, delete or save methods because the lab orchestrator lib doesn't create users. It's
     part of the program that uses this library to manage the users. That means you can create, update and delete users
     by your own without using this controller.
     """
 
     def __init__(self, adapter: UserAdapterInterface):
+        """Initializes a user controller.
+
+        :param adapter: User adapter that should be used.
+        """
         self.adapter = adapter
 
     def get_all(self) -> List[User]:
+        """Gives all objects of the adapter.
+
+        :return: A list of all objects of the adapter.
+        """
         return self.adapter.get_all()
 
-    def get(self, identifier) -> User:
+    def get(self, identifier: Identifier) -> User:
+        """Gives a specific object of the adapter.
+
+        :param identifier: The identifier of the object.
+        :return: The specific object.
+        """
         return self.adapter.get(identifier)
 
 
