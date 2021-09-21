@@ -14,6 +14,7 @@ class UserAdapterInterface:
         """Gives a list of all users.
 
         :return: A list of all users.
+        :raise NotImplementedError: Method needs to be implemented.
         """
         raise NotImplementedError()
 
@@ -22,6 +23,7 @@ class UserAdapterInterface:
 
         :param identifier: The identifier of the user.
         :return: A specific user.
+        :raise NotImplementedError: Method needs to be implemented.
         """
         raise NotImplementedError()
 
@@ -36,6 +38,7 @@ class DockerImageAdapterInterface:
         :param description: Description of the docker image.
         :param url: Url of the docker image.
         :return: A newly added docker image.
+        :raise NotImplementedError: Method needs to be implemented.
         """
         raise NotImplementedError()
 
@@ -43,6 +46,7 @@ class DockerImageAdapterInterface:
         """Gives all docker images.
 
         :return: A list of all docker images.
+        :raise NotImplementedError: Method needs to be implemented.
         """
         raise NotImplementedError()
 
@@ -51,6 +55,7 @@ class DockerImageAdapterInterface:
 
         :param identifier: The identifier of the docker image.
         :return: The specific docker image.
+        :raise NotImplementedError: Method needs to be implemented.
         """
         raise NotImplementedError()
 
@@ -60,6 +65,7 @@ class DockerImageAdapterInterface:
         :param attr: The attribute name that should be used to filter.
         :param value: The value of the attribute that should be filtered.
         :return: The specific docker image.
+        :raise NotImplementedError: Method needs to be implemented.
         """
         raise NotImplementedError()
 
@@ -68,6 +74,7 @@ class DockerImageAdapterInterface:
 
         :param identifier: The identifier of the docker image.
         :return: None
+        :raise NotImplementedError: Method needs to be implemented.
         """
         raise NotImplementedError()
 
@@ -76,6 +83,7 @@ class DockerImageAdapterInterface:
 
         :param obj: The docker image object that contains changes.
         :return: The docker image.
+        :raise NotImplementedError: Method needs to be implemented.
         """
         raise NotImplementedError()
 
@@ -86,6 +94,7 @@ class DockerImageAdapterInterface:
 
         :param kwargs: A dictionary with filters.
         :return: The first docker image that matches the filters.
+        :raise NotImplementedError: Method needs to be implemented.
         """
         raise NotImplementedError()
 
@@ -103,6 +112,7 @@ class LabAdapterInterface:
         :param docker_image_id: Docker image id of the lab.
         :param docker_image_name: Docker image name of the lab.
         :return: A newly added lab.
+        :raise NotImplementedError: Method needs to be implemented.
         """
         raise NotImplementedError()
 
@@ -110,6 +120,7 @@ class LabAdapterInterface:
         """Gives all labs.
 
         :return: A list of all labs.
+        :raise NotImplementedError: Method needs to be implemented.
         """
         raise NotImplementedError()
 
@@ -118,6 +129,7 @@ class LabAdapterInterface:
 
         :param identifier: The identifier of the lab.
         :return: The specific lab.
+        :raise NotImplementedError: Method needs to be implemented.
         """
         raise NotImplementedError()
 
@@ -127,6 +139,7 @@ class LabAdapterInterface:
         :param attr: The attribute name that should be used to filter.
         :param value: The value of the attribute that should be filtered.
         :return: The specific lab.
+        :raise NotImplementedError: Method needs to be implemented.
         """
         raise NotImplementedError()
 
@@ -135,6 +148,7 @@ class LabAdapterInterface:
 
         :param identifier: The identifier of the lab.
         :return: None
+        :raise NotImplementedError: Method needs to be implemented.
         """
         raise NotImplementedError()
 
@@ -143,6 +157,7 @@ class LabAdapterInterface:
 
         :param obj: The lab object that contains changes.
         :return: The lab.
+        :raise NotImplementedError: Method needs to be implemented.
         """
         raise NotImplementedError()
 
@@ -153,6 +168,7 @@ class LabAdapterInterface:
 
         :param kwargs: A dictionary with filters.
         :return: The first lab that matches the filters.
+        :raise NotImplementedError: Method needs to be implemented.
         """
         raise NotImplementedError()
 
@@ -166,6 +182,7 @@ class LabInstanceAdapterInterface:
         :param lab_id: Lab id of the lab instance.
         :param user_id: User id of the lab instance.
         :return: A newly added lab instance.
+        :raise NotImplementedError: Method needs to be implemented.
         """
         raise NotImplementedError()
 
@@ -173,6 +190,7 @@ class LabInstanceAdapterInterface:
         """Gives all lab instances.
 
         :return: A list of all lab instances.
+        :raise NotImplementedError: Method needs to be implemented.
         """
         raise NotImplementedError()
 
@@ -181,6 +199,7 @@ class LabInstanceAdapterInterface:
 
         :param identifier: The identifier of the lab instance.
         :return: The specific lab instance.
+        :raise NotImplementedError: Method needs to be implemented.
         """
         raise NotImplementedError()
 
@@ -190,6 +209,7 @@ class LabInstanceAdapterInterface:
         :param attr: The attribute name that should be used to filter.
         :param value: The value of the attribute that should be filtered.
         :return: The specific lab instance.
+        :raise NotImplementedError: Method needs to be implemented.
         """
         raise NotImplementedError()
 
@@ -198,6 +218,7 @@ class LabInstanceAdapterInterface:
 
         :param identifier: The identifier of the lab instance.
         :return: None
+        :raise NotImplementedError: Method needs to be implemented.
         """
         raise NotImplementedError()
 
@@ -206,6 +227,7 @@ class LabInstanceAdapterInterface:
 
         :param obj: The lab instance object that contains changes.
         :return: The lab instance.
+        :raise NotImplementedError: Method needs to be implemented.
         """
         raise NotImplementedError()
 
@@ -216,5 +238,6 @@ class LabInstanceAdapterInterface:
 
         :param kwargs: A dictionary with filters.
         :return: The first lab instance that matches the filters.
+        :raise NotImplementedError: Method needs to be implemented.
         """
         raise NotImplementedError()
