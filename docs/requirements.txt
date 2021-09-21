@@ -1,0 +1,7 @@
+sphinx==4.2.0
+sphinx_rtd_theme==1.0.0
+sphinx-autodoc-typehints==1.12.0
+PyYAML==5.4.1
+requests==2.26.0
+lab-orchestrator-lib-auth==0.0.5
+setuptools==51.0.0

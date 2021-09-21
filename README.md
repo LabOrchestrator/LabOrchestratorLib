@@ -52,7 +52,7 @@ Feel free to open [issues](https://github.com/LabOrchestrator/LabOrchestratorLib
 
 ### Project Structure
 
-The `src` folder contains the source code of the library. The `tests` folder contains the test cases. There is a makefile that contains some shortcuts for example to run the test cases and to make a release. Run `make help` to see all targets. The `docs` folder contains rst docs that are used in [read the docs](https://laborchestratorlib.readthedocs.io/en/latest/).
+The `src` folder contains the source code of the library. The `tests` folder contains the test cases. There is a makefile that contains some shortcuts for example to run the test cases and to make a release. Run `make help` to see all targets. The `docs` folder contains rst docs that are used in [read the docs](https://laborchestratorlib.readthedocs.io/en/latest/). Kubernetes yaml templates are placed in `src/lab_orchestrator_lib/templates/`.
 
 ### Developer Dependencies
 
