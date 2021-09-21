@@ -1,3 +1,12 @@
+"""Contains all implementations of controllers.
+
+In the documentation of this module "you" refers to the developer that uses this library, "your program" means the part
+of software that uses the lab orchestrator lib and "our library" refers to the lab orchestrator lib.
+
+When you use this library there are some controllers that you need to use to create resources and some that you don't
+need to use. The documentation of the controllers gives you specific information about this.
+"""
+
 from typing import List, Optional
 
 from lab_orchestrator_lib.template_engine import TemplateEngine
@@ -11,6 +20,13 @@ from lab_orchestrator_lib.model.model import DockerImage, Lab, LabInstance, Iden
 
 
 class UserController:
+    """User controller.
+
+    This is the only controller that has no create methods because the lab orchestrator lib doesn't create users. It's
+    part of the program that uses this library to manage the users. That means you can create, update and delete users
+    by your own without using this controller.
+    """
+
     def __init__(self, adapter: UserAdapterInterface):
         self.adapter = adapter
 
@@ -22,65 +38,159 @@ class UserController:
 
 
 class NamespaceController(NotNamespacedController):
+    """Controller of Kubernetes Namespaces.
+
+    When you need to create, delete or get namespaces in your program you need to use this controller. Usually you don't
+    need to create, get or delete namespaces by your own.
+    """
+
     template_file = "namespace_template.yaml"
 
     def _api(self) -> NotNamespacedApi:
+        """Gives an instance of the namespace api.
+
+        :return: An instance of the namespace api.
+        """
         return self.registry.namespace
 
     def create(self, namespace):
+        """Creates a new namespace.
+
+        :param namespace: The name of the namespace.
+        :return: YAML str of the namespace.
+        """
         template_data = {'namespace': namespace}
         data = self._get_template(template_data)
         return self._api().create(data)
 
 
 class NetworkPolicyController(NamespacedController):
+    """Controller of Kubernetes Namespaces.
+
+    When you need to create, delete or get network policies in your program you need to use this controller. Usually you
+    don't need to create, get or delete network policies by you own.
+    """
+
     template_file = 'network_policy_template.yaml'
 
     def _api(self) -> NamespacedApi:
+        """Gives an instance of the network policy api.
+
+        :return: An instance of the network policy api.
+        """
         return self.registry.network_policy
 
     def __init__(self, registry: APIRegistry, template_engine: Optional[TemplateEngine] = None):
+        """Initializes a network policy controller.
+
+        :param registry: The APIRegistry that should be used.
+        :param template_engine: The template engine that should be used. If none: a default one is used.
+        """
         super().__init__(registry, template_engine)
         self.default_name = "allow-same-namespace"
 
     def create(self, namespace):
+        """Creates a new network policy.
+
+        :param namespace: The name of the namespace where the network policy should be created.
+        :return: YAML str of the network policy.
+        """
         template_data = {'namespace': namespace, 'network_policy_name': self.default_name}
         data = self._get_template(template_data)
         return self._api().create(namespace, data)
 
 
 class DockerImageController(AdapterController):
+    """Docker image controller.
+
+    This controller is used by the library to get access to docker images. When you want to add new docker images, get
+    or delete old ones you can do it directly without using this controller.
+    """
+
     def __init__(self, adapter: DockerImageAdapterInterface):
+        """Initializes a docker image controller.
+
+        :param adapter: The docker image adapter that is used to connect to the database.
+        """
         super().__init__(adapter)
 
     def create(self, name, description, url) -> DockerImage:
+        """Creates a new docker image.
+
+        :param name: Name of the docker image.
+        :param description: Description of the docker image.
+        :param url: Url of the docker image.
+        :return: The created docker image.
+        """
         return self.adapter.create(name, description, url)
 
 
 class LabController(AdapterController):
+    """Lab controller.
+
+    This controller is used by the library to get access to labs. When you want to add new labs, get
+    or delete old ones you can do it directly without using this controller.
+    """
+
     def __init__(self, adapter: LabAdapterInterface):
+        """Initializes a lab controller.
+
+        :param adapter: The lab adapter that is used to connect to the database.
+        """
         super().__init__(adapter)
 
     def create(self, name: str, namespace_prefix: str, description: str, docker_image_id: Identifier,
                docker_image_name: str) -> Lab:
+        """Creates a new lab.
+
+        :param name: The name of the lab.
+        :param namespace_prefix: The namespace prefix of the lab.
+        :param description: The description of the lab
+        :param docker_image_id: The docker image id of the lab.
+        :param docker_image_name: The docker image name of the lab.
+        :return: The created docker image.
+        """
         return self.adapter.create(name=name, namespace_prefix=namespace_prefix, description=description,
                                    docker_image_id=docker_image_id, docker_image_name=docker_image_name)
 
 
 class VirtualMachineInstanceController(NamespacedController):
+    """Controller of KubeVirts VMIs.
+
+    When you need to create, delete or get VMIs in your program you need to use this controller. Usually you don't need
+    to create or delete VMIs by your own. Starting a VMIs is done automatically when you create a lab instance.
+    """
+
     template_file = 'vmi_template.yaml'
 
     def __init__(self, registry: APIRegistry, namespace_ctrl: NamespaceController,
                  docker_image_ctrl: DockerImageController,
                  template_engine: Optional[TemplateEngine] = None):
+        """Initializes a virtual machine instance controller.
+
+        :param registry: APIRegistry that should be used.
+        :param namespace_ctrl: Namespace controller that should be used.
+        :param docker_image_ctrl: Docker image controller that should be used.
+        :param template_engine: The template engine that should be used. If none: a default one is used.
+        """
         super().__init__(registry, template_engine)
         self.namespace_ctrl = namespace_ctrl
         self.docker_image_ctrl = docker_image_ctrl
 
     def _api(self) -> NamespacedApi:
+        """Gives an instance of the vmi api.
+
+        :return: An instance of the vmi api.
+        """
         return self.registry.virtual_machine_instance
 
     def create(self, namespace, lab: Lab):
+        """Creates a new virtual machine instance.
+
+        :param namespace: Namespace of the virtual machine instance.
+        :param lab: Lab that should be started.
+        :return: YAML str of the created virtual machine instance.
+        """
         docker_image = self.docker_image_ctrl.get(lab.docker_image_id)
         template_data = {"cores": 3, "memory": "3G",
                          "vm_image": docker_image.url, "vmi_name": lab.docker_image_name,
@@ -89,18 +199,39 @@ class VirtualMachineInstanceController(NamespacedController):
         return self._api().create(namespace, data)
 
     def get_list_of_lab_instance(self, lab_instance: LabInstance, lab_ctrl: LabController):
+        """Gives a list of virtual machine instances that belongs to a specific lab instance.
+
+        :param lab_instance: The lab instance.
+        :param lab_ctrl: The lab controller that is used to get the namespace.
+        :return: A list of VMIs that belong to this lab instance.
+        """
         namespace_name = LabInstanceController.get_namespace_name(lab_instance, lab_ctrl)
         namespace = self.namespace_ctrl.get(namespace_name)
         return self.get_list(namespace_name)
 
     def get_of_lab_instance(self, lab_instance: LabInstance, virtual_machine_instance_id,
                             lab_ctrl: LabController):
+        """Gives a specific of virtual machine instance that belongs to a specific lab instance.
+
+        :param lab_instance: The lab instance.
+        :param virtual_machine_instance_id: The id of the vmi.
+        :param lab_ctrl: The lab controller that is used to get the namespace.
+        :return: The specific VMI.
+        """
         namespace_name = LabInstanceController.get_namespace_name(lab_instance, lab_ctrl)
         namespace = self.namespace_ctrl.get(namespace_name)
         return self.get(namespace_name, virtual_machine_instance_id)
 
 
 class LabInstanceController(AdapterController):
+    """Controller of lab instances.
+
+    When you need to create, get or delete VMIs in your program you need to use this controller. Creating a new lab
+    instance will automatically create a namespace, a network policy and start all VMIs of the referred lab. You should
+    not delete a lab instance by your own, because then the namespace, network policy and the VMIs won't stop running
+    in Kubernetes.
+    """
+
     def __init__(self,
                  adapter: LabInstanceAdapterInterface,
                  virtual_machine_instance_ctrl: VirtualMachineInstanceController,
@@ -109,6 +240,16 @@ class LabInstanceController(AdapterController):
                  network_policy_ctrl: NetworkPolicyController,
                  user_ctrl: UserController,
                  secret_key: str):
+        """Initializes a lab instance controller.
+
+        :param adapter: The lab instance adapter that is used to connect to the database.
+        :param virtual_machine_instance_ctrl: The virtual machine instance controller that should be used.
+        :param namespace_ctrl: The namespace controller that should be used.
+        :param lab_ctrl: The lab controller that should be used.
+        :param network_policy_ctrl: The network policy controller that should be used.
+        :param user_ctrl: The user controller that should be used.
+        :param secret_key: The secret key that should be used to create JWT tokens.
+        """
         super().__init__(adapter)
         self.virtual_machine_instance_ctrl = virtual_machine_instance_ctrl
         self.namespace_ctrl = namespace_ctrl
@@ -118,12 +259,32 @@ class LabInstanceController(AdapterController):
         self.secret_key = secret_key
 
     @staticmethod
-    def get_namespace_name(lab_instance: LabInstance, lab_ctrl: LabController):
+    def get_namespace_name(lab_instance: LabInstance, lab_ctrl: LabController) -> str:
+        """Returns the namespace name where the resources of a lab instances are created.
+
+        The namespace name is generated by a combination of the labs namespace prefix, the user id and the lab instance
+        id. This namespace name is unique for every lab instance.
+
+        :param lab_instance: The lab instance from which you want the namespace name.
+        :param lab_ctrl: The lab controller that should be used.
+        :return: The name of the namespace.
+        """
         lab = lab_ctrl.get(lab_instance.lab_id)
         return LabInstanceController.gen_namespace_name(lab, lab_instance.user_id, lab_instance.primary_key)
 
     @staticmethod
-    def gen_namespace_name(lab: Lab, user_id, lab_instance_id):
+    def gen_namespace_name(lab: Lab, user_id, lab_instance_id) -> str:
+        """Generates the namespace name where the resources of a lab instances are created.
+
+        The namespace name is generated by a combination of the labs namespace prefix, the user id and the lab instance
+        id. This namespace name is unique for every lab instance.
+
+        :param lab: The lab that is started.
+        :param user_id: The user that starts this lab.
+        :param lab_instance_id: The id of the lab instance.
+        :return: The name of the namespace.
+        """
+
         return f"{lab.namespace_prefix}-{user_id}-{lab_instance_id}"
 
     def create(self, lab_id: Identifier, user_id: Identifier) -> LabInstanceKubernetes:

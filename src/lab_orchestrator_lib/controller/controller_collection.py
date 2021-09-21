@@ -1,3 +1,5 @@
+"""Contains a collection of controllers and a method to create all controllers at once."""
+
 from dataclasses import dataclass
 
 from lab_orchestrator_lib.controller.controller import NamespaceController, NetworkPolicyController, \
@@ -9,6 +11,7 @@ from lab_orchestrator_lib.kubernetes.api import APIRegistry
 
 @dataclass
 class ControllerCollection:
+    """Contains all controllers."""
     user_ctrl: UserController
     namespace_ctrl: NamespaceController
     network_policy_ctrl: NetworkPolicyController
@@ -25,6 +28,16 @@ def create_controller_collection(
         lab_adapter: LabAdapterInterface,
         lab_instance_adapter: LabInstanceAdapterInterface,
         secret_key: str):
+    """Initializes all controllers.
+
+    :param registry: APIRegistry that should be injected into Kubernetes controllers.
+    :param user_adapter: User adapter that should be injected into the controllers.
+    :param docker_image_adapter: Docker image adapter that should be injected into the controllers.
+    :param lab_adapter: Lab adapter that should be injected into the controllers.
+    :param lab_instance_adapter: Lab instance adapter that should be injected into the controllers.
+    :param secret_key: Secret key that should be used to create JWT tokens.
+    :return: A controller collection with initialized controllers.
+    """
     user_ctrl = UserController(user_adapter)
     namespace_ctrl = NamespaceController(registry)
     network_policy_ctrl = NetworkPolicyController(registry)
