@@ -33,6 +33,7 @@ User Controller
 ---------------
 
 .. autoclass:: lab_orchestrator_lib.controller.controller.UserController
+    :special-members: __init__
     :show-inheritance:
     :members:
     :undoc-members:
@@ -44,6 +45,7 @@ Namespace Controller
 --------------------
 
 .. autoclass:: lab_orchestrator_lib.controller.controller.NamespaceController
+    :special-members: __init__
     :show-inheritance:
     :members:
     :inherited-members:
@@ -57,6 +59,7 @@ Network Policy Controller
 -------------------------
 
 .. autoclass:: lab_orchestrator_lib.controller.controller.NetworkPolicyController
+    :special-members: __init__
     :show-inheritance:
     :members:
     :inherited-members:
@@ -70,6 +73,7 @@ Docker Image Controller
 -----------------------
 
 .. autoclass:: lab_orchestrator_lib.controller.controller.DockerImageController
+    :special-members: __init__
     :show-inheritance:
     :members:
     :inherited-members:
@@ -82,6 +86,7 @@ Lab Controller
 --------------
 
 .. autoclass:: lab_orchestrator_lib.controller.controller.LabController
+    :special-members: __init__
     :show-inheritance:
     :members:
     :inherited-members:
@@ -94,6 +99,7 @@ Virtual Machine Instance Controller
 -----------------------------------
 
 .. autoclass:: lab_orchestrator_lib.controller.controller.VirtualMachineInstanceController
+    :special-members: __init__
     :show-inheritance:
     :members:
     :inherited-members:
@@ -107,6 +113,7 @@ Lab Instance Controller
 -----------------------
 
 .. autoclass:: lab_orchestrator_lib.controller.controller.LabInstanceController
+    :special-members: __init__
     :show-inheritance:
     :members:
     :inherited-members:
@@ -122,6 +129,7 @@ Controller Collection
 A controller collection is a collection of all controllers. You can create one with the ``lab_orchestrator_lib.controllers.controller_collection.create_controller_collection(...)`` function. This function takes all adapters, one api registry and a secret key for creating JWT tokens as parameter. The api registry is needed for the Kubernetes controllers and the adapters are injected into the database controllers.
 
 .. autoclass:: lab_orchestrator_lib.controller.controller_collection.ControllerCollection
+    :special-members: __init__
     :show-inheritance:
     :members:
     :inherited-members:
@@ -140,6 +148,7 @@ Adapter Controller
 ------------------
 
 .. autoclass:: lab_orchestrator_lib.controller.adapter_controller.AdapterController
+    :special-members: __init__
     :show-inheritance:
     :members:
     :inherited-members:
@@ -150,6 +159,7 @@ Kubernetes Controller
 ---------------------
 
 .. autoclass:: lab_orchestrator_lib.controller.kubernetes_controller.KubernetesController
+    :special-members: __init__
     :show-inheritance:
     :members:
     :inherited-members:
@@ -159,6 +169,7 @@ Namespaced Controller
 ---------------------
 
 .. autoclass:: lab_orchestrator_lib.controller.kubernetes_controller.NamespacedController
+    :special-members: __init__
     :show-inheritance:
     :members:
     :inherited-members:
@@ -169,6 +180,7 @@ Not Namespaced Controller
 -------------------------
 
 .. autoclass:: lab_orchestrator_lib.controller.kubernetes_controller.NotNamespacedController
+    :special-members: __init__
     :show-inheritance:
     :members:
     :inherited-members:

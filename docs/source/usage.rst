@@ -32,7 +32,7 @@ The second type is database resources. They are saved in the database. For every
 
 A ``DockerImage`` is a link to a docker image that contains the VM image. A ``Lab`` contains one or multiple (currently not supported) VMs, each one is linked to a ``DockerImage``. A lab can be started which results into a ``LabInstance``. A ``LabInstance`` contains some ``VirtualMachineInstances`` running in a ``Namespace`` that can be accessed with VNC. The ``LabInstances`` are separated from other ``LabInstances`` with ``NetworkPolicys``.
 
-See more at the :doc:`model` documentation.
+See more at the :doc:`models` documentation.
 
 Controller
 ----------
