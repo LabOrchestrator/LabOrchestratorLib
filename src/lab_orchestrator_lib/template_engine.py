@@ -1,3 +1,5 @@
+"""Contains a template engine that is used to parse yaml files."""
+
 import re
 from typing import Any, Dict, Union, TextIO, Hashable
 
