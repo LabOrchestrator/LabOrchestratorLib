@@ -1,3 +1,5 @@
+https://img.shields.io/librariesio/release/pypi/lab-orchestrator-lib
+
 # Lab Orchestrator Lib
 
 This package contains the lab orchestrator library.
