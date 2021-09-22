@@ -14,9 +14,10 @@ from lab_orchestrator_lib_auth.auth import generate_auth_token, LabInstanceToken
 from lab_orchestrator_lib.controller.adapter_controller import AdapterController
 from lab_orchestrator_lib.controller.kubernetes_controller import NamespacedController, NotNamespacedController
 from lab_orchestrator_lib.database.adapter import DockerImageAdapterInterface, LabAdapterInterface, \
-    LabInstanceAdapterInterface, UserAdapterInterface
+    LabInstanceAdapterInterface, UserAdapterInterface, LabDockerImageAdapterInterface
 from lab_orchestrator_lib.kubernetes.api import NotNamespacedApi, NamespacedApi, APIRegistry
-from lab_orchestrator_lib.model.model import DockerImage, Lab, LabInstance, Identifier, User, LabInstanceKubernetes
+from lab_orchestrator_lib.model.model import DockerImage, Lab, LabInstance, Identifier, User, LabInstanceKubernetes, \
+    LabDockerImage
 
 
 class UserController:
@@ -138,6 +139,31 @@ class DockerImageController(AdapterController):
         return self.adapter.create(name, description, url)
 
 
+class LabDockerImageController(AdapterController):
+    """Lab docker image controller.
+
+    This controller is used by the library to get access to lab docker images. When you want to add new lab docker
+    images, get or delete old ones you can do it directly without using this controller.
+    """
+
+    def __init__(self, adapter: LabDockerImageAdapterInterface):
+        """Initializes a lab docker image controller.
+
+        :param adapter: The lab docker image adapter that is used to connect to the database.
+        """
+        super().__init__(adapter)
+
+    def create(self, lab_id: Identifier, docker_image_id: Identifier, docker_image_name: str) -> LabDockerImage:
+        """Creates a new lab docker image.
+
+        :param lab_id: Id of the lab.
+        :param docker_image_id: Id of the docker image.
+        :param docker_image_name: Name of the VM.
+        :return: The created lab docker image.
+        """
+        return self.adapter.create(lab_id, docker_image_id, docker_image_name)
+
+
 class LabController(AdapterController):
     """Lab controller.
 
@@ -152,19 +178,15 @@ class LabController(AdapterController):
         """
         super().__init__(adapter)
 
-    def create(self, name: str, namespace_prefix: str, description: str, docker_image_id: Identifier,
-               docker_image_name: str) -> Lab:
+    def create(self, name: str, namespace_prefix: str, description: str) -> Lab:
         """Creates a new lab.
 
         :param name: The name of the lab.
         :param namespace_prefix: The namespace prefix of the lab.
         :param description: The description of the lab
-        :param docker_image_id: The docker image id of the lab.
-        :param docker_image_name: The docker image name of the lab.
         :return: The created docker image.
         """
-        return self.adapter.create(name=name, namespace_prefix=namespace_prefix, description=description,
-                                   docker_image_id=docker_image_id, docker_image_name=docker_image_name)
+        return self.adapter.create(name=name, namespace_prefix=namespace_prefix, description=description)
 
 
 class VirtualMachineInstanceController(NamespacedController):
@@ -177,18 +199,20 @@ class VirtualMachineInstanceController(NamespacedController):
     template_file = 'vmi_template.yaml'
 
     def __init__(self, registry: APIRegistry, namespace_ctrl: NamespaceController,
-                 docker_image_ctrl: DockerImageController,
+                 docker_image_ctrl: DockerImageController, lab_docker_image_ctrl: LabDockerImageController,
                  template_engine: Optional[TemplateEngine] = None):
         """Initializes a virtual machine instance controller.
 
         :param registry: APIRegistry that should be used.
         :param namespace_ctrl: Namespace controller that should be used.
         :param docker_image_ctrl: Docker image controller that should be used.
+        :param lab_docker_image_ctrl: Lab docker image controller that should be used.
         :param template_engine: The template engine that should be used. If none: a default one is used.
         """
         super().__init__(registry, template_engine)
         self.namespace_ctrl = namespace_ctrl
         self.docker_image_ctrl = docker_image_ctrl
+        self.lab_docker_image_ctrl = lab_docker_image_ctrl
 
     def _api(self) -> NamespacedApi:
         """Gives an instance of the vmi api.
@@ -197,16 +221,16 @@ class VirtualMachineInstanceController(NamespacedController):
         """
         return self.registry.virtual_machine_instance
 
-    def create(self, namespace, lab: Lab):
+    def create(self, namespace, lab_docker_image: LabDockerImage):
         """Creates a new virtual machine instance.
 
         :param namespace: Namespace of the virtual machine instance.
-        :param lab: Lab that should be started.
+        :param lab_docker_image: Lab docker image that should be started.
         :return: YAML str of the created virtual machine instance.
         """
-        docker_image = self.docker_image_ctrl.get(lab.docker_image_id)
+        docker_image = self.docker_image_ctrl.get(lab_docker_image.docker_image_id)
         template_data = {"cores": 3, "memory": "3G",
-                         "vm_image": docker_image.url, "vmi_name": lab.docker_image_name,
+                         "vm_image": docker_image.url, "vmi_name": lab_docker_image.docker_image_name,
                          "namespace": namespace}
         data = self._get_template(template_data)
         return self._api().create(namespace, data)
@@ -248,6 +272,7 @@ class LabInstanceController(AdapterController):
     def __init__(self,
                  adapter: LabInstanceAdapterInterface,
                  virtual_machine_instance_ctrl: VirtualMachineInstanceController,
+                 lab_docker_image_ctrl: LabDockerImageController,
                  namespace_ctrl: NamespaceController,
                  lab_ctrl: LabController,
                  network_policy_ctrl: NetworkPolicyController,
@@ -265,6 +290,7 @@ class LabInstanceController(AdapterController):
         """
         super().__init__(adapter)
         self.virtual_machine_instance_ctrl = virtual_machine_instance_ctrl
+        self.lab_docker_image_ctrl = lab_docker_image_ctrl
         self.namespace_ctrl = namespace_ctrl
         self.lab_ctrl = lab_ctrl
         self.network_policy_ctrl = network_policy_ctrl
@@ -336,16 +362,21 @@ class LabInstanceController(AdapterController):
         #    self.namespace_ctrl.delete(namespace_name)
         #    raise Exception
         # create vmi
-        vmi = self.virtual_machine_instance_ctrl.create(namespace_name, lab)
-        #if vmi.response_code != 0:
-        #    self.adapter.delete(lab_instance.primary_key)
-        #    self.namespace_ctrl.delete(namespace_name)
-        #    raise Exception
+        lab_docker_images = self.lab_docker_image_ctrl.get_by_attr('lab_id', lab_id)
+        for lab_docker_image in lab_docker_images:
+            print(f"Starting VMI: {lab_docker_image.docker_image_name} - {lab_docker_image.docker_image_id}")
+            vmi = self.virtual_machine_instance_ctrl.create(namespace_name, lab_docker_image)
+            #if vmi.response_code != 0:
+            #    self.adapter.delete(lab_instance.primary_key)
+            #    self.namespace_ctrl.delete(namespace_name)
+            #    raise Exception
+        allowed_vmis = [lab_docker_image.docker_image_name for lab_docker_image in lab_docker_images]
         lab_instance_token_params = LabInstanceTokenParams(lab_id, lab_instance.primary_key, namespace_name,
-                                                           [lab.docker_image_name])
+                                                           allowed_vmis)
         token = generate_auth_token(user_id=user_id, lab_instance_token_params=lab_instance_token_params,
                                     secret_key=self.secret_key)
-        return LabInstanceKubernetes(primary_key=lab_instance.primary_key, lab_id=lab_id, user_id=user_id, jwt_token=token)
+        return LabInstanceKubernetes(primary_key=lab_instance.primary_key, lab_id=lab_id, user_id=user_id,
+                                     jwt_token=token, allowed_vmis=allowed_vmis)
 
     def delete(self, lab_instance: LabInstance) -> None:
         """Deletes a lab instance.
