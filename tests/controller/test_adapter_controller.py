@@ -27,20 +27,6 @@ class AdapterControllerTestCase(unittest.TestCase):
         ret = ctrl.get(expected_id)
         self.assertEqual(ret, expected)
 
-    def test_get_by_attr(self):
-        this = self
-        expected = "hallo"
-        expected_attr = "attr"
-        expected_value = "value"
-        class Adapter:
-            def get_by_attr(self, attr, value):
-                this.assertEqual(attr, expected_attr)
-                this.assertEqual(value, expected_value)
-                return expected
-        ctrl = AdapterController(Adapter())
-        ret = ctrl.get_by_attr(expected_attr, expected_value)
-        self.assertEqual(ret, expected)
-
     def test_delete(self):
         this = self
         expected = "hallo"

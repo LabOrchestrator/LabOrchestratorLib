@@ -36,15 +36,6 @@ class AdapterController(Generic[Adapter, LibModelType]):
         """
         return self.adapter.get(identifier)
 
-    def get_by_attr(self, attr, value) -> LibModelType:
-        """Gives a specific object of the adapter.
-
-        :param attr: The attribute name that should be used to filter.
-        :param value: The value of the attribute that should be filtered.
-        :return: The specific object.
-        """
-        return self.adapter.get_by_attr(attr, value)
-
     def delete(self, identifier) -> None:
         """Deletes a specific object of the adapter.
 
@@ -61,12 +52,12 @@ class AdapterController(Generic[Adapter, LibModelType]):
         """
         return self.adapter.save(obj)
 
-    def filter(self, **kwargs) -> LibModelType:
-        """Filters the objects of the adapter and returns the first object that matches the filter criteria.
+    def filter(self, **kwargs) -> List[LibModelType]:
+        """Filters the objects of the adapter and returns all objects that matches the filter criteria.
 
         The database should be filtered by the attributes and belonging values that are given in the kwargs dictionary.
 
         :param kwargs: A dictionary with filters.
-        :return: The first object that matches the filters.
+        :return: All objects that matches the filters.
         """
         return self.adapter.filter(**kwargs)

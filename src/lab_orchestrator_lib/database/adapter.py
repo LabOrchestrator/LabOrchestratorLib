@@ -59,16 +59,6 @@ class DockerImageAdapterInterface:
         """
         raise NotImplementedError()
 
-    def get_by_attr(self, attr: str, value: Any) -> DockerImage:
-        """Gives a specific docker image.
-
-        :param attr: The attribute name that should be used to filter.
-        :param value: The value of the attribute that should be filtered.
-        :return: The specific docker image.
-        :raise NotImplementedError: Method needs to be implemented.
-        """
-        raise NotImplementedError()
-
     def delete(self, identifier: Identifier) -> None:
         """Deletes a specific docker image.
 
@@ -87,13 +77,13 @@ class DockerImageAdapterInterface:
         """
         raise NotImplementedError()
 
-    def filter(self, **kwargs: Dict[str, Any]) -> DockerImage:
-        """Filters the docker images and returns the first docker image that matches the filter criteria.
+    def filter(self, **kwargs: Dict[str, Any]) -> List[DockerImage]:
+        """Filters the docker images and returns all docker images that matches the filter criteria.
 
         The database should be filtered by the attributes and belonging values that are given in the kwargs dictionary.
 
         :param kwargs: A dictionary with filters.
-        :return: The first docker image that matches the filters.
+        :return: All docker images that matches the filters.
         :raise NotImplementedError: Method needs to be implemented.
         """
         raise NotImplementedError()
@@ -130,16 +120,6 @@ class LabDockerImageAdapterInterface:
         """
         raise NotImplementedError()
 
-    def get_by_attr(self, attr: str, value: Any) -> LabDockerImage:
-        """Gives a specific lab docker image.
-
-        :param attr: The attribute name that should be used to filter.
-        :param value: The value of the attribute that should be filtered.
-        :return: The specific lab docker image.
-        :raise NotImplementedError: Method needs to be implemented.
-        """
-        raise NotImplementedError()
-
     def delete(self, identifier: Identifier) -> None:
         """Deletes a specific lab docker image.
 
@@ -158,13 +138,13 @@ class LabDockerImageAdapterInterface:
         """
         raise NotImplementedError()
 
-    def filter(self, **kwargs: Dict[str, Any]) -> LabDockerImage:
-        """Filters the lab docker images and returns the first lab docker image that matches the filter criteria.
+    def filter(self, **kwargs: Dict[str, Any]) -> List[LabDockerImage]:
+        """Filters the lab docker images and returns all lab docker images that matches the filter criteria.
 
         The database should be filtered by the attributes and belonging values that are given in the kwargs dictionary.
 
         :param kwargs: A dictionary with filters.
-        :return: The first lab docker image that matches the filters.
+        :return: All lab docker images that matches the filters.
         :raise NotImplementedError: Method needs to be implemented.
         """
         raise NotImplementedError()
@@ -201,16 +181,6 @@ class LabAdapterInterface:
         """
         raise NotImplementedError()
 
-    def get_by_attr(self, attr: str, value: Any) -> Lab:
-        """Gives a specific lab.
-
-        :param attr: The attribute name that should be used to filter.
-        :param value: The value of the attribute that should be filtered.
-        :return: The specific lab.
-        :raise NotImplementedError: Method needs to be implemented.
-        """
-        raise NotImplementedError()
-
     def delete(self, identifier: Identifier) -> None:
         """Deletes a specific lab.
 
@@ -229,13 +199,13 @@ class LabAdapterInterface:
         """
         raise NotImplementedError()
 
-    def filter(self, **kwargs: Dict[str, Any]) -> Lab:
-        """Filters the labs and returns the first lab that matches the filter criteria.
+    def filter(self, **kwargs: Dict[str, Any]) -> List[Lab]:
+        """Filters the labs and returns all labs that matches the filter criteria.
 
         The database should be filtered by the attributes and belonging values that are given in the kwargs dictionary.
 
         :param kwargs: A dictionary with filters.
-        :return: The first lab that matches the filters.
+        :return: All labs that matches the filters.
         :raise NotImplementedError: Method needs to be implemented.
         """
         raise NotImplementedError()
@@ -271,16 +241,6 @@ class LabInstanceAdapterInterface:
         """
         raise NotImplementedError()
 
-    def get_by_attr(self, attr: str, value: Any) -> LabInstance:
-        """Gives a specific lab instance.
-
-        :param attr: The attribute name that should be used to filter.
-        :param value: The value of the attribute that should be filtered.
-        :return: The specific lab instance.
-        :raise NotImplementedError: Method needs to be implemented.
-        """
-        raise NotImplementedError()
-
     def delete(self, identifier: Identifier) -> None:
         """Deletes a specific lab instance.
 
@@ -299,13 +259,13 @@ class LabInstanceAdapterInterface:
         """
         raise NotImplementedError()
 
-    def filter(self, **kwargs: Dict[str, Any]) -> LabInstance:
-        """Filters the lab instances and returns the first lab instance that matches the filter criteria.
+    def filter(self, **kwargs: Dict[str, Any]) -> List[LabInstance]:
+        """Filters the lab instances and returns all lab instances that matches the filter criteria.
 
         The database should be filtered by the attributes and belonging values that are given in the kwargs dictionary.
 
         :param kwargs: A dictionary with filters.
-        :return: The first lab instance that matches the filters.
+        :return: All lab instances that matches the filters.
         :raise NotImplementedError: Method needs to be implemented.
         """
         raise NotImplementedError()

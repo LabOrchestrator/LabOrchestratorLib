@@ -363,7 +363,7 @@ class LabInstanceController(AdapterController):
         #    self.namespace_ctrl.delete(namespace_name)
         #    raise Exception
         # create vmi
-        lab_docker_images = self.lab_docker_image_ctrl.get_by_attr('lab_id', lab_id)
+        lab_docker_images = self.lab_docker_image_ctrl.filter(lab_id=lab_id)
         for lab_docker_image in lab_docker_images:
             print(f"Starting VMI: {lab_docker_image.docker_image_name} - {lab_docker_image.docker_image_id}")
             vmi = self.virtual_machine_instance_ctrl.create(namespace_name, lab_docker_image)
@@ -394,13 +394,12 @@ class LabInstanceController(AdapterController):
         # now delete local object
         super().delete(lab_instance.primary_key)
 
-    def get_list_of_user(self, user: User):
+    def get_list_of_user(self, user: User) -> List[LabInstance]:
         """Gives a list of lab instances that belong to a specific user.
 
         :param user: The user that belongs to the lab instances.
         :return: A list of lab instances that belongs to the user.
         """
-        # TODO list instead of item
         lab_instances = self.adapter.filter(user_id=user.primary_key)
         return lab_instances
 
