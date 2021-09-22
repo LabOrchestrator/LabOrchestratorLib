@@ -1,5 +1,5 @@
 """Contains the dataclasses that are used in this project."""
-from typing import Union
+from typing import Union, List
 
 from lab_orchestrator_lib.custom_exceptions import ValidationError
 
@@ -56,6 +56,30 @@ class DockerImage(Model):
         self.url = url
 
 
+class LabDockerImage(Model):
+    """A Lab Docker Image is a docker image that is referenced to a lab.
+
+    This is needed to have multiple VMs in one lab.
+    """
+
+    def __init__(self, primary_key: Identifier, lab_id: Identifier, docker_image_id: Identifier,
+                 docker_image_name: str):
+        """Initializes a lab docker image.
+
+        :param primary_key: A unique value to identify the object.
+        :param lab_id: Id of the lab.
+        :param docker_image_id: Id of the docker image.
+        :param docker_image_name: Name of the VM.
+        :raise ValidationError: if one of the parameters has an invalid value.
+        """
+        super().__init__(primary_key)
+        self.lab_id = lab_id
+        self.docker_image_id = docker_image_id
+        if len(docker_image_name) > 32:
+            raise ValidationError("docker_image_name is longer than 32 characters.")
+        self.docker_image_name = docker_image_name
+
+
 class Lab(Model):
     """Lab is a combination of VMs that can be started.
 
@@ -63,16 +87,13 @@ class Lab(Model):
     to combine VMs in a scenario.
     """
 
-    def __init__(self, primary_key: Identifier, name: str, namespace_prefix: str, description: str,
-                 docker_image_id: Identifier, docker_image_name: str):
+    def __init__(self, primary_key: Identifier, name: str, namespace_prefix: str, description: str):
         """Initializes a lab object.
 
         :param primary_key: A unique value to identify the object.
         :param name: The name of the lab. (max. 32 chars)
         :param namespace_prefix: A prefix that is used in the namespace in Kubernetes where the VMs are started. (max. 32 chars)
         :param description: A short description of the docker image. (max. 128 chars)
-        :param docker_image_id: The id of the docker image that should be used in this lab.
-        :param docker_image_name: The name of the VM. (used when connecting to the VM) (max. 32 chars)
         :raise ValidationError: if one of the parameters has an invalid value.
         """
         super().__init__(primary_key)
@@ -82,13 +103,9 @@ class Lab(Model):
             raise ValidationError("namespace_prefix is longer than 32 characters.")
         if len(description) > 128:
             raise ValidationError("description is longer than 128 characters.")
-        if len(docker_image_name) > 32:
-            raise ValidationError("docker_image_name is longer than 32 characters.")
         self.name = name
         self.namespace_prefix = namespace_prefix
         self.description = description
-        self.docker_image_id = docker_image_id
-        self.docker_image_name = docker_image_name
 
 
 class LabInstance(Model):
@@ -116,17 +133,18 @@ class LabInstanceKubernetes(Model):
     Doesn't need any adapter and should not be saved in the database. This is used to return the JWT access token when
     the lab is started.
     """
-    def __init__(self, primary_key: Identifier, lab_id: Identifier, user_id: Identifier, jwt_token: str):
+    def __init__(self, primary_key: Identifier, lab_id: Identifier, user_id: Identifier, jwt_token: str,
+                 allowed_vmis: List[str]):
         """Initializes a lab instance kubernetes object.
 
         :param primary_key: A unique value to identify the object.
         :param lab_id: The id of the lab that is started.
         :param user_id: The id of the user that has started the lab.
         :param jwt_token: JWT token that can be used to access the VMs in this lab instance.
+        :param allowed_vmis: List of VMI names that the user is allowed to open.
         """
         super().__init__(primary_key)
         self.lab_id = lab_id
         self.user_id = user_id
         self.jwt_token = jwt_token
-
-
+        self.allowed_vmis = allowed_vmis
