@@ -19,6 +19,7 @@ lab\_orchestrator\_lib.model.model
    
       DockerImage
       Lab
+      LabDockerImage
       LabInstance
       LabInstanceKubernetes
       Model

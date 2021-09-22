@@ -3,12 +3,13 @@ Models
 
 The library contains two types of resources. The first is Kubernetes resources. This type contains ``NetworkPolicy``, ``VirtualMachineInstance`` and ``Namespace`` objects. These are resources from Kubernetes that doesn't need to be saved.
 
-The second type is database resources. They are saved in the database. For every database resource an adapter needs to be added. This type contains ``user``, ``DockerImage``, ``Lab`` and ``LabInstance`` objects.
+The second type is database resources. They are saved in the database. For every database resource an adapter needs to be added. This type contains ``user``, ``DockerImage``, ``LabDockerImage``, ``Lab`` and ``LabInstance`` objects.
 
 Database resources:
 
 * `User`_
 * `Docker Image`_
+* `Lab Docker Image`_
 * `Lab`_
 * `Lab Instance`_
 * `Lab Instance Kubernetes`_
@@ -33,6 +34,17 @@ Docker Image
 ------------
 
 .. autoclass:: lab_orchestrator_lib.model.model.DockerImage
+    :show-inheritance:
+    :special-members: __init__
+    :undoc-members:
+
+    .. rubric:: Methods
+
+
+Lab Docker Image
+----------------
+
+.. autoclass:: lab_orchestrator_lib.model.model.LabDockerImage
     :show-inheritance:
     :special-members: __init__
     :undoc-members:
