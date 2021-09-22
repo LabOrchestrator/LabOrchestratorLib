@@ -1,6 +1,18 @@
+[![Status](https://img.shields.io/pypi/status/lab-orchestrator-lib)](https://pypi.org/project/lab-orchestrator-lib/)
+[![Version](https://img.shields.io/pypi/v/lab-orchestrator-lib?label=release)](https://pypi.org/project/lab-orchestrator-lib/)
+[![License](https://img.shields.io/github/license/laborchestrator/laborchestratorlib)](https://github.com/LabOrchestrator/LabOrchestratorLib/blob/main/LICENSE)
+[![Issues](https://img.shields.io/github/issues/laborchestrator/laborchestratorlib)](https://github.com/laborchestrator/laborchestratorlib/issues)
+[![Downloads](https://img.shields.io/pypi/dw/lab-orchestrator-lib)](https://pypi.org/project/lab-orchestrator-lib/)
+[![Dependencies](https://img.shields.io/librariesio/release/pypi/lab-orchestrator-lib)](https://libraries.io/pypi/lab-orchestrator-lib)
+[![Docs](https://img.shields.io/readthedocs/laborchestratorlib)](https://laborchestratorlib.readthedocs.io/en/latest/)
+
 # Lab Orchestrator Lib
 
 This package contains the lab orchestrator library.
+
+[Github](https://github.com/LabOrchestrator/LabOrchestratorLib)  
+[PyPi](https://pypi.org/project/lab-orchestrator-lib/)  
+[Read The Docs](https://laborchestratorlib.readthedocs.io/en/latest/index.html)
 
 ## Installation
 
