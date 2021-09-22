@@ -1,7 +1,7 @@
 """Contains all adapters that needs to be implemented to use the lab orchestrator lib."""
 from typing import List, Any, Dict
 
-from lab_orchestrator_lib.model.model import DockerImage, Lab, LabInstance, Identifier, User
+from lab_orchestrator_lib.model.model import DockerImage, Lab, LabInstance, Identifier, User, LabDockerImage
 
 
 class UserAdapterInterface:
@@ -99,18 +99,86 @@ class DockerImageAdapterInterface:
         raise NotImplementedError()
 
 
+class LabDockerImageAdapterInterface:
+    """Adapter that is used to connect the lab docker image model to the database."""
+
+    def create(self, lab_id: Identifier, docker_image_id: Identifier, docker_image_name: str) -> LabDockerImage:
+        """Creates a lab docker image and saves it to the database.
+
+        :param lab_id: Id of the lab.
+        :param docker_image_id: Id of the docker image.
+        :param docker_image_name: Name of the VM.
+        :return: A newly added lab docker image.
+        :raise NotImplementedError: Method needs to be implemented.
+        """
+        raise NotImplementedError()
+
+    def get_all(self) -> List[LabDockerImage]:
+        """Gives all lab docker images.
+
+        :return: A list of all lab docker images.
+        :raise NotImplementedError: Method needs to be implemented.
+        """
+        raise NotImplementedError()
+
+    def get(self, identifier: Identifier) -> LabDockerImage:
+        """Gives a specific lab docker image.
+
+        :param identifier: The identifier of the lab docker image.
+        :return: The specific lab docker image.
+        :raise NotImplementedError: Method needs to be implemented.
+        """
+        raise NotImplementedError()
+
+    def get_by_attr(self, attr: str, value: Any) -> LabDockerImage:
+        """Gives a specific lab docker image.
+
+        :param attr: The attribute name that should be used to filter.
+        :param value: The value of the attribute that should be filtered.
+        :return: The specific lab docker image.
+        :raise NotImplementedError: Method needs to be implemented.
+        """
+        raise NotImplementedError()
+
+    def delete(self, identifier: Identifier) -> None:
+        """Deletes a specific lab docker image.
+
+        :param identifier: The identifier of the lab docker image.
+        :return: None
+        :raise NotImplementedError: Method needs to be implemented.
+        """
+        raise NotImplementedError()
+
+    def save(self, obj: LabDockerImage) -> LabDockerImage:
+        """Saves changes of the lab docker image to the database.
+
+        :param obj: The lab docker image object that contains changes.
+        :return: The lab docker image.
+        :raise NotImplementedError: Method needs to be implemented.
+        """
+        raise NotImplementedError()
+
+    def filter(self, **kwargs: Dict[str, Any]) -> LabDockerImage:
+        """Filters the lab docker images and returns the first lab docker image that matches the filter criteria.
+
+        The database should be filtered by the attributes and belonging values that are given in the kwargs dictionary.
+
+        :param kwargs: A dictionary with filters.
+        :return: The first lab docker image that matches the filters.
+        :raise NotImplementedError: Method needs to be implemented.
+        """
+        raise NotImplementedError()
+
+
 class LabAdapterInterface:
     """Adapter that is used to connect the lab model to the database."""
 
-    def create(self, name: str, namespace_prefix: str, description: str, docker_image_id: Identifier,
-               docker_image_name: str) -> Lab:
+    def create(self, name: str, namespace_prefix: str, description: str) -> Lab:
         """Creates a lab and saves it to the database.
 
         :param name: Name of the lab.
         :param namespace_prefix: Namespace prefix of the lab.
         :param description: Description of the lab.
-        :param docker_image_id: Docker image id of the lab.
-        :param docker_image_name: Docker image name of the lab.
         :return: A newly added lab.
         :raise NotImplementedError: Method needs to be implemented.
         """
