@@ -27,7 +27,8 @@ setup(
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: Mozilla Public License 2.0 (MPL 2.0)",
-        "Operating System :: OS Independent"
+        "Operating System :: OS Independent",
+        "Development Status :: 3 - Alpha",
     ],
     package_dir={"": "src"},
     packages=find_packages(where="src"),
