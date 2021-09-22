@@ -283,6 +283,7 @@ class LabInstanceController(AdapterController):
         :param adapter: The lab instance adapter that is used to connect to the database.
         :param virtual_machine_instance_ctrl: The virtual machine instance controller that should be used.
         :param namespace_ctrl: The namespace controller that should be used.
+        :param lab_docker_image_ctrl: The lab docker image controller that should be used.
         :param lab_ctrl: The lab controller that should be used.
         :param network_policy_ctrl: The network policy controller that should be used.
         :param user_ctrl: The user controller that should be used.
