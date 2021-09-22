@@ -19,6 +19,7 @@ lab\_orchestrator\_lib.controller.controller
    
       DockerImageController
       LabController
+      LabDockerImageController
       LabInstanceController
       NamespaceController
       NetworkPolicyController

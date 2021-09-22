@@ -9,6 +9,7 @@ Available controllers are:
 * `Namespace Controller`_
 * `Network Policy Controller`_
 * `Docker Image Controller`_
+* `Lab Docker Image Controller`_
 * `Lab Controller`_
 * `Virtual Machine Instance Controller`_
 * `Lab Instance Controller`_
@@ -73,6 +74,19 @@ Docker Image Controller
 -----------------------
 
 .. autoclass:: lab_orchestrator_lib.controller.controller.DockerImageController
+    :special-members: __init__
+    :show-inheritance:
+    :members:
+    :inherited-members:
+    :undoc-members:
+
+    .. rubric:: Methods
+
+
+Lab Docker Image Controller
+---------------------------
+
+.. autoclass:: lab_orchestrator_lib.controller.controller.LabDockerImageController
     :special-members: __init__
     :show-inheritance:
     :members:

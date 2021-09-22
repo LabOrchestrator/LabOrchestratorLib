@@ -19,6 +19,7 @@ lab\_orchestrator\_lib.database.adapter
    
       DockerImageAdapterInterface
       LabAdapterInterface
+      LabDockerImageAdapterInterface
       LabInstanceAdapterInterface
       UserAdapterInterface
    

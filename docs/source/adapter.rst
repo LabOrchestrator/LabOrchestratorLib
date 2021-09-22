@@ -7,6 +7,7 @@ Take a look at the controller references to see which adapters you need when you
 
 * `User Adapter Interface`_
 * `Docker Image Adapter Interface`_
+* `Lab Docker Image Adapter Interface`_
 * `Lab Adapter Interface`_
 * `Lab Instance Adapter Interface`_
 
@@ -31,6 +32,16 @@ Docker Image Adapter Interface
 ------------------------------
 
 .. autoclass:: lab_orchestrator_lib.database.adapter.DockerImageAdapterInterface
+    :members:
+    :undoc-members:
+
+    .. rubric:: Methods
+
+
+Lab Docker Image Adapter Interface
+----------------------------------
+
+.. autoclass:: lab_orchestrator_lib.database.adapter.LabDockerImageAdapterInterface
     :members:
     :undoc-members:
 
