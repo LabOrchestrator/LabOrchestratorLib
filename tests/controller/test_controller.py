@@ -467,9 +467,8 @@ class LabInstanceControllerTestCase(unittest.TestCase):
 
         lab_docker_image_ctrl = LabDockerImageController(LabDockerImageAdapterInterface())
 
-        def lab_docker_image_filter(attr, value):
-            self.assertEqual(attr, "lab_id")
-            self.assertEqual(value, expected_lab.primary_key)
+        def lab_docker_image_filter(**kwargs):
+            self.assertDictEqual({'lab_id': expected_lab.primary_key}, kwargs)
             return [expected_lab_docker_image_1, expected_lab_docker_image_2]
 
         lab_docker_image_ctrl.filter = lab_docker_image_filter
