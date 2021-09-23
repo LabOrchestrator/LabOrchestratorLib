@@ -341,16 +341,24 @@ class LabInstanceController(AdapterController):
         """
         lab = self.lab_ctrl.get(lab_id)
         if lab is None:
+            print("lab not found")
             # TODO sinnvolle exception werfen
             raise Exception
         user = self.user_ctrl.get(user_id)
         if user is None:
+            print("user not found")
             # TODO sinnvolle exception werfen
             raise Exception
         lab_instance = self.adapter.create(lab_id=lab_id, user_id=user_id)
+        print("lab_instance")
+        print(lab_instance)
         # create namespace
         namespace_name = LabInstanceController.gen_namespace_name(lab, user_id, lab_instance.primary_key)
+        print("namespace_name")
+        print(namespace_name)
         namespace = self.namespace_ctrl.create(namespace_name)
+        print("namespace")
+        print(namespace)
         # TODO fix response code
         # TODO log if deletion doesn't work
         #if namespace.response_code != 0:
