@@ -19,6 +19,12 @@ Abstract resources:
 * `Model`_
 
 
+This guide refers to valid dns labels and valid dns subdomain names. The definitions of these two can be found here:
+
+* `dns labels <https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#rfc-1035-label-names>`_
+* `dns subdomain names <https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#dns-subdomain-names>`_
+
+
 User
 ----
 

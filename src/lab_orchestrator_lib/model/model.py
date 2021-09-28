@@ -23,7 +23,7 @@ class Model:
 
 def check_dns_name(name) -> bool:
     """Checks if the name is a valid dns label.
-    
+
     Definition: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#dns-label-names
 
     :param name: The name to check.
