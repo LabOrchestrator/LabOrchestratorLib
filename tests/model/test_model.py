@@ -2,7 +2,7 @@ import unittest
 
 from lab_orchestrator_lib.custom_exceptions import ValidationError
 
-from lab_orchestrator_lib.model.model import check_dns_name, User, DockerImage, Model
+from lab_orchestrator_lib.model.model import check_dns_name, User, DockerImage, Model, LabDockerImage
 
 dns_tests = [
     ("abc", True), ("a/b", False), ("aäb", False),
@@ -107,3 +107,15 @@ class DockerImageTestCase(unittest.TestCase):
             else:
                 with self.assertRaises(ValidationError):
                     DockerImage(1, "hi", "desc", url)
+
+
+class LabDockerImageTestCase(unittest.TestCase):
+    def test_docker_image_name(self):
+        for name, expected in dns_subdomain_tests:
+            print(name, expected)
+            if expected:
+                self.assertIsInstance(LabDockerImage(1, 1, 1, name), LabDockerImage)
+            else:
+                with self.assertRaises(ValidationError):
+                    LabDockerImage(1, 1, 1, name)
+

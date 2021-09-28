@@ -141,14 +141,14 @@ class LabDockerImage(Model):
         :param primary_key: A unique value to identify the object.
         :param lab_id: Id of the lab.
         :param docker_image_id: Id of the docker image.
-        :param docker_image_name: Name of the VM.
+        :param docker_image_name: Name of the VM. (valid dns subdomain)
         :raise ValidationError: if one of the parameters has an invalid value.
         """
         super().__init__(primary_key)
         self.lab_id = lab_id
         self.docker_image_id = docker_image_id
-        if len(docker_image_name) > 32:
-            raise ValidationError("docker_image_name is longer than 32 characters.")
+        if not check_dns_subdomain_name(docker_image_name):
+            raise ValidationError("docker_image_name is not a valid dns subdomain")
         self.docker_image_name = docker_image_name
 
 
