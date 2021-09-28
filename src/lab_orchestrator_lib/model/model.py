@@ -13,8 +13,11 @@ class Model:
     def __init__(self, primary_key: Identifier):
         """Initializes a model object.
 
-        :param primary_key: A unique value to identify the object.
+        :param primary_key: A unique value to identify the object. (if string, min. 1 char)
+        :raise ValidationError: if one of the parameters has an invalid value.
         """
+        if isinstance(primary_key, str) and len(primary_key) <= 0:
+            raise ValidationError("primary key is too short.")
         self.primary_key = primary_key
 
 

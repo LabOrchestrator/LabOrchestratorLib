@@ -37,3 +37,16 @@ class CheckDnsSubdomainTestCase(unittest.TestCase):
             print(name, expected)
             self.assertEqual(check_dns_name(name), expected)
 
+
+class ModelTestCase(unittest.TestCase):
+    def test_pk(self):
+        tests = [
+            ("", False), ("hallo", True), ("a" * 13, True), (8, True)
+        ]
+        for pk, expected in tests:
+            print(pk, expected)
+            if expected:
+                self.assertIsInstance(Model(pk), Model)
+            else:
+                with self.assertRaises(ValidationError):
+                    Model(pk)
