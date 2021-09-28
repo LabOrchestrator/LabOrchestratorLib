@@ -18,6 +18,62 @@ class Model:
         self.primary_key = primary_key
 
 
+def check_dns_name(name) -> bool:
+    """Checks if the name is a valid dns label.
+    
+    Definition: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#dns-label-names
+
+    :param name: The name to check.
+    :return: If the dns name is valid.
+    """
+    alphabetic = "abcdefghijklmnopqrstuvwxyz"
+    alphanumeric = alphabetic + "1234567890"
+    allowed_chars = alphanumeric + "-"
+    if len(name) <= 0:
+        return False
+    if len(name) > 63:
+        return False
+    # contain only lowercase alphanumeric characters or '-'
+    for char in name:
+        if char not in allowed_chars:
+            return False
+    # start with an alphabetic character
+    if name[0] not in alphabetic:
+        return False
+    # end with an alphanumeric character
+    if name[len(name) - 1] not in alphanumeric:
+        return False
+    return True
+
+
+def check_dns_subdomain_name(name) -> bool:
+    """Checks if the name is a valid dns subdomain name.
+
+    Definition: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#dns-subdomain-names
+
+    :param name: The name to check.
+    :return: If the dns subdomain name is valid.
+    """
+    alphabetic = "abcdefghijklmnopqrstuvwxyz"
+    alphanumeric = alphabetic + "1234567890"
+    allowed_chars = alphanumeric + "-."
+    if len(name) <= 0:
+        return False
+    if len(name) > 253:
+        return False
+    # contain only lowercase alphanumeric characters or '-' or '.'
+    for char in name:
+        if char not in allowed_chars:
+            return False
+    # start with an alphanumeric character
+    if name[0] not in alphanumeric:
+        return False
+    # end with an alphanumeric character
+    if name[len(name) - 1] not in alphanumeric:
+        return False
+    return True
+
+
 class User(Model):
     """A User of the library."""
 
