@@ -242,8 +242,8 @@ class VirtualMachineInstanceControllerTestCase(unittest.TestCase):
     def test_get_list_of_lab_instance(self):
         this = self
         # Input Objects
-        expected_lab_instance = LabInstance("1", "2", "3")
-        expected_lab = Lab("4", "name", "pref", "desc")
+        expected_lab_instance = LabInstance(1, 2, 3)
+        expected_lab = Lab(4, "name", "pref", "desc")
         expected = "success"
         expected_namespace = \
             f"{expected_lab.namespace_prefix}-{expected_lab_instance.user_id}-{expected_lab_instance.primary_key}"
@@ -297,9 +297,9 @@ class VirtualMachineInstanceControllerTestCase(unittest.TestCase):
     def test_get_of_lab_instance(self):
         this = self
         # Input Objects
-        expected_lab_instance = LabInstance("1", "2", "3")
-        expected_lab = Lab("4", "name", "pref", "desc")
-        expected_vmi_id = "2"
+        expected_lab_instance = LabInstance(1, 2, 3)
+        expected_lab = Lab(4, "name", "pref", "desc")
+        expected_vmi_id = 2
         expected = "success"
         expected_namespace = \
             f"{expected_lab.namespace_prefix}-{expected_lab_instance.user_id}-{expected_lab_instance.primary_key}"
@@ -380,8 +380,8 @@ class LabInstanceControllerTestCase(unittest.TestCase):
         self.assertIsInstance(lab_instance_ctrl, LabInstanceController)
 
     def test_get_namespace_name(self):
-        expected_lab = Lab("3", "name", "prefix", "desc")
-        expected_lab_instance = LabInstance("8", "9", "10")
+        expected_lab = Lab(3, "name", "prefix", "desc")
+        expected_lab_instance = LabInstance(8, 9, 10)
         expected_namespace_name = f"{expected_lab.namespace_prefix}-{expected_lab_instance.user_id}-{expected_lab_instance.primary_key}"
         namespace_ctrl = NamespaceController(self.registry)
         namespace_ctrl._api = lambda: None
@@ -398,8 +398,8 @@ class LabInstanceControllerTestCase(unittest.TestCase):
         self.assertEqual(namespace_name, expected_namespace_name)
 
     def test_gen_namespace_name(self):
-        expected_lab = Lab("3", "name", "prefix", "desc")
-        expected_lab_instance = LabInstance("8", "9", "10")
+        expected_lab = Lab(3, "name", "prefix", "desc")
+        expected_lab_instance = LabInstance(8, 9, 10)
         expected_namespace_name = f"{expected_lab.namespace_prefix}-{expected_lab_instance.user_id}-{expected_lab_instance.primary_key}"
         namespace_ctrl = NamespaceController(self.registry)
         namespace_ctrl._api = lambda: None
@@ -417,13 +417,13 @@ class LabInstanceControllerTestCase(unittest.TestCase):
 
     def test_create(self):
         this = self
-        expected_lab_id = "3"
-        expected_user_id = "5"
-        expected_lab = Lab("3", "name", "prefix", "desc")
-        expected_user = User("5")
-        expected_lab_instance = LabInstance("6", "7", "8")
-        expected_lab_docker_image_1 = LabDockerImage("1", "3", "4", "ubuntu")
-        expected_lab_docker_image_2 = LabDockerImage("2", "3", "5", "arch")
+        expected_lab_id = 3
+        expected_user_id = 5
+        expected_lab = Lab(3, "name", "prefix", "desc")
+        expected_user = User(5)
+        expected_lab_instance = LabInstance(6, 7, 8)
+        expected_lab_docker_image_1 = LabDockerImage(1, 3, 4, "ubuntu")
+        expected_lab_docker_image_2 = LabDockerImage(2, 3, 5, "arch")
         expected_namespace_name = f"{expected_lab.namespace_prefix}-{expected_user_id}-{expected_lab_instance.primary_key}"
 
         class ExampleLabInstanceAdapter(LabInstanceAdapterInterface):
@@ -506,10 +506,10 @@ class LabInstanceControllerTestCase(unittest.TestCase):
 
     def test_delete(self):
         this = self
-        expected_lab_id = "3"
-        expected_user_id = "5"
-        expected_lab = Lab("3", "name", "prefix", "desc")
-        expected_lab_instance = LabInstance("6", "3", "5")
+        expected_lab_id = 3
+        expected_user_id = 5
+        expected_lab = Lab(3, "name", "prefix", "desc")
+        expected_lab_instance = LabInstance(6, 3, 5)
         expected_namespace_name = f"{expected_lab.namespace_prefix}-{expected_user_id}-{expected_lab_instance.primary_key}"
 
         class ExampleLabInstanceAdapter(LabInstanceAdapterInterface):
@@ -555,8 +555,8 @@ class LabInstanceControllerTestCase(unittest.TestCase):
 
     def test_get_list_of_user(self):
         this = self
-        expected_lab_instance = LabInstance("2", "3", "1")
-        expected_user = User("1")
+        expected_lab_instance = LabInstance(2, 3, 1)
+        expected_user = User(1)
         class ExampleLabInstanceAdapter(LabInstanceAdapterInterface):
             def filter(self, **kwargs: Dict[str, Any]) -> LabInstance:
                 this.assertDictEqual(kwargs, {'user_id': expected_user.primary_key})
@@ -602,6 +602,6 @@ class LabInstanceControllerTestCase(unittest.TestCase):
             lab_ctrl=lab_ctrl, network_policy_ctrl=network_policy_ctrl, user_ctrl=user_ctrl, secret_key="secret",
             lab_docker_image_ctrl=lab_docker_image_ctrl
         )
-        lab_instance = LabInstance("8", "9", "10")
+        lab_instance = LabInstance(8, 9, 10)
         with self.assertRaises(Exception) as e:
             lab_instance_ctrl.save(lab_instance)
