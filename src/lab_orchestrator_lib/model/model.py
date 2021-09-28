@@ -104,16 +104,23 @@ class DockerImage(Model):
         """Initializes a docker image object.
 
         :param primary_key: A unique value to identify the object.
-        :param name: The name of the docker image. (max. 32 chars)
-        :param description: A short description of the docker image. (max. 128 chars)
-        :param url: The url to the image. (max. 256 chars)
+        :param name: The name of the docker image. (min. 1 char, max. 32 chars)
+        :param description: A short description of the docker image. (min. 1 char, max. 128 chars)
+        :param url: The url to the image. (min. 1 char, max. 256 chars)
         :raise ValidationError: if one of the parameters has an invalid value.
         """
         super().__init__(primary_key)
+        if len(name) <= 0:
+            raise ValidationError("name is too short.")
         if len(name) > 32:
             raise ValidationError("name is longer than 32 characters.")
+        if len(description) <= 0:
+            raise ValidationError("description is too short.")
         if len(description) > 128:
             raise ValidationError("description is longer than 128 characters.")
+        # TODO: more validation for url
+        if len(url) <= 0:
+            raise ValidationError("url is too short.")
         if len(url) > 256:
             raise ValidationError("url is longer than 256 characters.")
         self.name = name

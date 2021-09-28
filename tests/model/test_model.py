@@ -69,3 +69,41 @@ class UserTestCase(unittest.TestCase):
             else:
                 with self.assertRaises(ValidationError):
                     User(pk)
+
+
+class DockerImageTestCase(unittest.TestCase):
+    def test_name(self):
+        tests = [
+            ("", False), ("hallo", True), ("a" * 33, False), ("a" * 32, True),
+        ]
+        for name, expected in tests:
+            print(name, expected)
+            if expected:
+                self.assertIsInstance(DockerImage(1, name, "desc", "url"), DockerImage)
+            else:
+                with self.assertRaises(ValidationError):
+                    DockerImage(1, name, "desc", "url")
+
+    def test_desc(self):
+        tests = [
+            ("", False), ("hallo", True), ("a" * 129, False), ("a" * 128, True)
+        ]
+        for desc, expected in tests:
+            print(desc, expected)
+            if expected:
+                self.assertIsInstance(DockerImage(1, "hi", desc, "url"), DockerImage)
+            else:
+                with self.assertRaises(ValidationError):
+                    DockerImage(1, "hi", desc, "url")
+
+    def test_url(self):
+        tests = [
+            ("", False), ("hallo", True), ("a" * 257, False), ("a" * 256, True)
+        ]
+        for url, expected in tests:
+            print(url, expected)
+            if expected:
+                self.assertIsInstance(DockerImage(1, "hi", "desc", url), DockerImage)
+            else:
+                with self.assertRaises(ValidationError):
+                    DockerImage(1, "hi", "desc", url)
