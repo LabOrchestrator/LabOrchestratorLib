@@ -83,8 +83,14 @@ class User(Model):
     def __init__(self, primary_key: Identifier):
         """Initializes a user object.
 
-        :param primary_key: A unique value to identify the user.
+        :param primary_key: A unique value to identify the object. (if string, max. 12 chars and needs to be a valid dns label)
+        :raise ValidationError: if one of the parameters has an invalid value.
         """
+        if isinstance(primary_key, str):
+            if len(primary_key) > 12:
+                raise ValidationError("primary key is longer than 12 characters.")
+            if not check_dns_name(primary_key):
+                raise ValidationError("primary key contains illegal characters.")
         super().__init__(primary_key)
 
 
