@@ -163,16 +163,22 @@ class Lab(Model):
         """Initializes a lab object.
 
         :param primary_key: A unique value to identify the object.
-        :param name: The name of the lab. (max. 32 chars)
-        :param namespace_prefix: A prefix that is used in the namespace in Kubernetes where the VMs are started. (max. 32 chars)
-        :param description: A short description of the docker image. (max. 128 chars)
+        :param name: The name of the lab. (min. 1 char, max. 32 chars)
+        :param namespace_prefix: A prefix that is used in the namespace in Kubernetes where the VMs are started. (max. 32 chars and needs to be a valid dns label)
+        :param description: A short description of the docker image. (min. 1 char, max. 128 chars)
         :raise ValidationError: if one of the parameters has an invalid value.
         """
         super().__init__(primary_key)
+        if len(name) <= 0:
+            raise ValidationError("name is too short.")
         if len(name) > 32:
             raise ValidationError("name is longer than 32 characters.")
         if len(namespace_prefix) > 32:
             raise ValidationError("namespace_prefix is longer than 32 characters.")
+        if not check_dns_name(namespace_prefix):
+            raise ValidationError("namespace_prefix is not a valid dns label.")
+        if len(description) <= 0:
+            raise ValidationError("description is too short.")
         if len(description) > 128:
             raise ValidationError("description is longer than 128 characters.")
         self.name = name
@@ -190,10 +196,16 @@ class LabInstance(Model):
     def __init__(self, primary_key: Identifier, lab_id: Identifier, user_id: Identifier):
         """Initializes a lab instance object.
 
-        :param primary_key: A unique value to identify the object.
+        :param primary_key: A unique value to identify the object. (if string, max. 16 chars and needs to be a valid dns label)
         :param lab_id: The id of the lab that is started.
         :param user_id: The id of the user that has started the lab.
+        :raise ValidationError: if one of the parameters has an invalid value.
         """
+        if isinstance(primary_key, str):
+            if len(primary_key) > 16:
+                raise ValidationError("primary key is longer than 16 characters.")
+            if not check_dns_name(primary_key):
+                raise ValidationError("primary key is not a valid dns label")
         super().__init__(primary_key)
         self.lab_id = lab_id
         self.user_id = user_id
@@ -209,7 +221,7 @@ class LabInstanceKubernetes(Model):
                  allowed_vmis: List[str]):
         """Initializes a lab instance kubernetes object.
 
-        :param primary_key: A unique value to identify the object.
+        :param primary_key: A unique value to identify the object. (if string, max. 14 chars)
         :param lab_id: The id of the lab that is started.
         :param user_id: The id of the user that has started the lab.
         :param jwt_token: JWT token that can be used to access the VMs in this lab instance.

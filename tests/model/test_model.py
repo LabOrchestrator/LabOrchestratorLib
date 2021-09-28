@@ -2,7 +2,7 @@ import unittest
 
 from lab_orchestrator_lib.custom_exceptions import ValidationError
 
-from lab_orchestrator_lib.model.model import check_dns_name, User, DockerImage, Model, LabDockerImage
+from lab_orchestrator_lib.model.model import check_dns_name, User, DockerImage, Model, LabDockerImage, Lab, LabInstance
 
 dns_tests = [
     ("abc", True), ("a/b", False), ("aäb", False),
@@ -10,7 +10,7 @@ dns_tests = [
     ("def.", False), (".def", False), ("d.ef", False),
     ("Abv", False), ("aBc", False), ("abC", False),
     ("8ab", False), ("ab8", True), ("a8b", True),
-    ("", False), ("a" * 64, False), ("a" * 63, True)
+    ("", False), ("a", True), ("a" * 64, False), ("a" * 63, True)
 ]
 
 
@@ -27,7 +27,7 @@ dns_subdomain_tests = [
     ("def.", False), (".def", False), ("d.ef", True),
     ("Abv", False), ("aBc", False), ("abC", False),
     ("8ab", True), ("ab8", True), ("a8b", True),
-    ("", False), ("a" * 254, False), ("a" * 253, True)
+    ("", False), ("a", True), ("a" * 254, False), ("a" * 253, True)
 ]
 
 
@@ -118,4 +118,66 @@ class LabDockerImageTestCase(unittest.TestCase):
             else:
                 with self.assertRaises(ValidationError):
                     LabDockerImage(1, 1, 1, name)
+
+
+class LabTestCase(unittest.TestCase):
+    def test_name(self):
+        tests = [
+            ("", False), ("hallo", True), ("a" * 33, False), ("a" * 32, True)
+        ]
+        for name, expected in tests:
+            print(name, expected)
+            if expected:
+                self.assertIsInstance(Lab(1, name, "a", "desc"), Lab)
+            else:
+                with self.assertRaises(ValidationError):
+                    Lab(1, name, "a", "desc")
+
+    def test_namespace_prefix(self):
+        dns_tests = [
+            ("abc", True), ("a/b", False), ("aäb", False),
+            ("def-", False), ("-def", False), ("d-ef", True),
+            ("def.", False), (".def", False), ("d.ef", False),
+            ("Abv", False), ("aBc", False), ("abC", False),
+            ("8ab", False), ("ab8", True), ("a8b", True),
+            ("", False), ("a", True), ("a" * 33, False), ("a" * 32, True)
+        ]
+        for name, expected in dns_tests:
+            print(name, expected)
+            if expected:
+                self.assertIsInstance(Lab(1, "a", name, "desc"), Lab)
+            else:
+                with self.assertRaises(ValidationError):
+                    Lab(1, "a", name, "desc")
+
+    def test_description(self):
+        tests = [
+            ("", False), ("hallo", True), ("a" * 129, False), ("a" * 128, True)
+        ]
+        for name, expected in tests:
+            print(name, expected)
+            if expected:
+                self.assertIsInstance(Lab(1, "a", "a", name), Lab)
+            else:
+                with self.assertRaises(ValidationError):
+                    Lab(1, name, "a", "desc")
+
+
+class LabInstanceTestCase(unittest.TestCase):
+    def test_pk(self):
+        dns_tests = [
+            ("abc", True), ("a/b", False), ("aäb", False),
+            ("def-", False), ("-def", False), ("d-ef", True),
+            ("def.", False), (".def", False), ("d.ef", False),
+            ("Abv", False), ("aBc", False), ("abC", False),
+            ("8ab", False), ("ab8", True), ("a8b", True),
+            ("", False), ("a", True), ("a" * 17, False), ("a" * 16, True)
+        ]
+        for name, expected in dns_tests:
+            print(name, expected)
+            if expected:
+                self.assertIsInstance(LabInstance(name, 1, 1), LabInstance)
+            else:
+                with self.assertRaises(ValidationError):
+                    LabInstance(name, 1, 1)
 
